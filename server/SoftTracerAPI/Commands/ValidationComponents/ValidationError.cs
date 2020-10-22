@@ -13,6 +13,7 @@ namespace SofTracerAPI.Commands
             IsInvalid = errors.Count > 0;
             Errors = errors;
             Error = string.Join(", ", errors);
+            if (IsInvalid) { Error = $"{Error}."; }
         }
 
         public bool IsInvalid { get;  }

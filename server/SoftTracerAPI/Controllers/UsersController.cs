@@ -2,6 +2,7 @@
 using SofTracerAPI.Controllers;
 using SoftTracerAPI.Commands.Users;
 using SoftTracerAPI.Misc;
+using SoftTracerAPI.Repositories;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Drawing.Imaging;
@@ -28,6 +29,10 @@ namespace SoftTracerAPI.Controllers
         {
             ValidationError error = new CreateUserCommandValidator().Validate(command);
             if (error.IsInvalid) { return BadRequest(error.Error);}
+            UsersRepository repository = new UsersRepository(_connection);
+            if (repository.UserExists(command.UserId)) { return BadRequest("Já existe um usuário com este nome."); }
+            if (repository.EmailExists(command.Email)) { return BadRequest("Já existe um usuário cadastrado neste e-mail."); }
+            repository.CreateUser(command);
             return Ok();
         }
 
