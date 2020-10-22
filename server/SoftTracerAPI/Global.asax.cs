@@ -1,7 +1,7 @@
 ﻿using System.Web;
 using System.Web.Http;
 
-namespace SofTracerAPI
+namespace SoftTracerAPI
 {
     public class WebApiApplication : HttpApplication
     {

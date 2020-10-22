@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using SofTracerAPI.Controllers;
+using SoftTracerAPI.Commands.Users;
+using SoftTracerAPI.Misc;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Drawing.Imaging;
 using System.Web.Http;
 
 namespace SoftTracerAPI.Controllers
 {
-    public class ValuesController : ApiController
+    public class UsersController : BaseController
     {
         // GET api/values
         public IEnumerable<string> Get()
@@ -18,8 +23,9 @@ namespace SoftTracerAPI.Controllers
         }
 
         // POST api/values
-        public void Post([FromBody]string value)
+        public void Post([FromBody] CreateUserCommand command)
         {
+            object a = _connection;
         }
 
         // PUT api/values/5
