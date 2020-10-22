@@ -1,15 +1,16 @@
-﻿namespace SoftTracerAPI.Commands.Users
+﻿using SofTracerAPI.Commands;
+
+namespace SoftTracerAPI.Commands.Users
 {
-    public class CreateUserCommandValidator
+    public class CreateUserCommandValidator : BaseValidator, IValidator<CreateUserCommand>
     {
-
-        public string UserId { get; set; }
-
-        public string DisplayName { get; set; }
-
-        public string Email { get; set; }
-
-        public string Password { get; set; }
-
+        public ValidationError Validate(CreateUserCommand command)
+        {
+            if (string.IsNullOrWhiteSpace(command.UserId)) { _manager.AddError("Usuário inválido"); }
+            if (string.IsNullOrWhiteSpace(command.Password)) { _manager.AddError("Senha inválida"); }
+            if (string.IsNullOrWhiteSpace(command.Email)) { _manager.AddError("E-mail inválido"); }
+            if (string.IsNullOrWhiteSpace(command.DisplayName)) { _manager.AddError("Nome inválido"); }
+            return _manager.GetError();
+        }
     }
 }

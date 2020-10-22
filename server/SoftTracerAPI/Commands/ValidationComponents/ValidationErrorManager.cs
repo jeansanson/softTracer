@@ -8,19 +8,19 @@ namespace SofTracerAPI.Commands
     {
         private List<string> _errors;
 
-        ValidationErrorManager()
+        public ValidationErrorManager()
         {
             _errors = new List<string>();
         }
 
-        void AddError(string error)
+        public void AddError(string error)
         {
             _errors.Add(error);
         }
 
-        string GetErrors()
+        public ValidationError GetError()
         {
-            return string.Join(", ",_errors);
+            return new ValidationError(_errors);
         }
     }
 }

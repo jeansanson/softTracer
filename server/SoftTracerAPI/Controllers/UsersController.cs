@@ -1,4 +1,5 @@
-﻿using SofTracerAPI.Controllers;
+﻿using SofTracerAPI.Commands;
+using SofTracerAPI.Controllers;
 using SoftTracerAPI.Commands.Users;
 using SoftTracerAPI.Misc;
 using System.Collections.Generic;
@@ -23,9 +24,11 @@ namespace SoftTracerAPI.Controllers
         }
 
         // POST api/values
-        public void Post([FromBody] CreateUserCommand command)
+        public IHttpActionResult CreateUser([FromBody] CreateUserCommand command)
         {
-            object a = _connection;
+            ValidationError error = new CreateUserCommandValidator().Validate(command);
+            if (error.IsInvalid) { return BadRequest(error.Error);}
+            return Ok();
         }
 
         // PUT api/values/5

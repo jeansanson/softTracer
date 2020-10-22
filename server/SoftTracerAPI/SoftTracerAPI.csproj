@@ -177,6 +177,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Commands\ValidationComponents\BaseValidator.cs" />
+    <Compile Include="Commands\ValidationComponents\ValidationError.cs" />
+    <Compile Include="Commands\ValidationComponents\ValidationErrorManager.cs" />
+    <Compile Include="Commands\ValidationComponents\IValidator.cs" />
+    <Compile Include="Commands\Users\CreateUserCommandValidator.cs" />
     <Compile Include="Commands\Users\CreateUserCommand.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
@@ -201,7 +206,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
-    <Folder Include="Validators\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
