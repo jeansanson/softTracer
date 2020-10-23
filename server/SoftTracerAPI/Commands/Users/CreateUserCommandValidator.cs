@@ -8,7 +8,10 @@ namespace SoftTracerAPI.Commands.Users
         {
             if (string.IsNullOrWhiteSpace(command.UserId)) { _manager.AddError("Usuário inválido"); }
             if (string.IsNullOrWhiteSpace(command.Password)) { _manager.AddError("Senha inválida"); }
-            if (string.IsNullOrWhiteSpace(command.Email)) { _manager.AddError("E-mail inválido"); }
+            if (string.IsNullOrWhiteSpace(command.Email)
+                || !$"{command.Email}".Contains("@")
+                || !$"{command.Email}".Contains(".")
+                || $"{command.Email}".Length < 4) { _manager.AddError("E-mail inválido"); }
             if (string.IsNullOrWhiteSpace(command.DisplayName)) { _manager.AddError("Nome inválido"); }
             if ($"{command.UserId}".Length > 100) { _manager.AddError("Usuário possui muitos caracteres"); }
             if ($"{command.Password}".Length > 100) { _manager.AddError("Senha possui muitos caracteres"); }
