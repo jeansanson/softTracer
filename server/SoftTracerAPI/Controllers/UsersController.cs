@@ -2,7 +2,6 @@
 using SofTracerAPI.Controllers;
 using SoftTracerAPI.Commands.Users;
 using SoftTracerAPI.Repositories;
-using System;
 using System.Collections.Generic;
 using System.Web.Http;
 
@@ -26,6 +25,7 @@ namespace SoftTracerAPI.Controllers
         [HttpPost]
         public IHttpActionResult CreateUser([FromBody] CreateUserCommand command)
         {
+            if (command == null) { return BadRequest("Corpo da requisição inválida"); }
             ValidationError error = new CreateUserCommandValidator().Validate(command);
             if (error.IsInvalid) { return BadRequest(error.Error); }
             UsersRepository repository = new UsersRepository(_connection);
@@ -36,9 +36,10 @@ namespace SoftTracerAPI.Controllers
         }
 
         [HttpPost]
-        [Route("authentiation")]
+        [Route("~/api/users/authentication")]
         public IHttpActionResult FindToken([FromBody] FindAuthenticationCommand command)
         {
+            if (command == null) { return BadRequest("Corpo da requisição inválida"); }
             ValidationError error = new FindTokenCommandValidator().Validate(command);
             if (error.IsInvalid) { return BadRequest(error.Error); }
             UsersRepository repository = new UsersRepository(_connection);
