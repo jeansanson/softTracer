@@ -1,6 +1,9 @@
 ﻿using ExtensionMethods;
 using MySql.Data.MySqlClient;
 using SoftTracerAPI.Commands.Users;
+using System;
+using System.Data;
+using System.Reflection.Emit;
 using System.Text;
 
 namespace SoftTracerAPI.Repositories
@@ -18,15 +21,8 @@ namespace SoftTracerAPI.Repositories
         #region UserExists
         public bool UserExists(string userId)
         {
-            MySqlCommand command = new MySqlCommand(GetUserExistsQuery(userId), _connection);
+            MySqlCommand command = new MySqlCommand($"SELECT COUNT(0) FROM users WHERE username={ Extensions.SqlString(userId)}", _connection);
             return int.Parse(command.ExecuteScalar().ToString()) > 0;
-        }
-
-        private static string GetUserExistsQuery(string userId)
-        {
-            StringBuilder sql = new StringBuilder();
-            sql.AppendLine($"SELECT COUNT(0) FROM users WHERE username={ Extensions.SqlString(userId)}");
-            return sql.ToString();
         }
 
         #endregion
@@ -34,15 +30,54 @@ namespace SoftTracerAPI.Repositories
         #region EmailExists
         public bool EmailExists(string email)
         {
-            MySqlCommand command = new MySqlCommand(GetEmailExistsQuery(email), _connection);
+            MySqlCommand command = new MySqlCommand($"SELECT COUNT(0) FROM users WHERE email={ Extensions.SqlString(email)}", _connection);
             return int.Parse(command.ExecuteScalar().ToString()) > 0;
         }
 
-        private static string GetEmailExistsQuery(string email)
+        #endregion
+
+        #region FindUsernameByToken
+
+        public string FindUsernameByToken(Guid token)
         {
-            StringBuilder sql = new StringBuilder();
-            sql.AppendLine($"SELECT COUNT(0) FROM users WHERE email={ Extensions.SqlString(email)}");
-            return sql.ToString();
+            MySqlCommand command = new MySqlCommand($"SELECT username FROM users WHERE token=@token", _connection);
+            command.Parameters.AddWithValue("@token", token);
+            return command.ExecuteScalar().ToString();
+        }
+
+        #endregion
+
+        #region Authentication
+
+ 
+        public Authentication FindAuthentication(FindAuthenticationCommand model)
+        {
+            Authentication result = null;
+            MySqlCommand command = new MySqlCommand($"SELECT username,displayName,email,token FROM users WHERE username=@username AND password=@password", _connection);
+            command.Parameters.AddWithValue("@username", model.UserId);
+            command.Parameters.AddWithValue("@password", Extensions.EncryptString(model.Password));
+            
+            using(IDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    result = PopulateAuthentition(reader);
+
+                }
+            }
+
+            return result;
+        }
+
+        private static Authentication PopulateAuthentition(IDataReader reader)
+        {
+            return new Authentication
+            {
+                DisplayName = reader["displayName"].ToString(),
+                Email = reader["email"].ToString(),
+                Token = new Guid(reader["token"].ToString()),
+                UserId = reader["username"].ToString()
+            };
         }
 
         #endregion
@@ -70,12 +105,15 @@ namespace SoftTracerAPI.Repositories
         {
             StringBuilder sql = new StringBuilder();
             sql.AppendLine("INSERT INTO users").AppendLine();
-            sql.AppendLine("(username,displayname,password,email)").AppendLine();
+            sql.AppendLine("(username,displayname,password,email,token)").AppendLine();
             sql.AppendLine("VALUES").AppendLine();
-            sql.AppendLine("(@username,@displayname,@password,@email)");
+            sql.AppendLine("(@username,@displayname,@password,@email,UUID())");
             return sql.ToString();
         }
 
         #endregion CreateUser
+
+
+
     }
 }
