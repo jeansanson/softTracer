@@ -11,19 +11,7 @@ namespace SoftTracerAPI.Controllers
 {
     public class UsersController : BaseController
     {
-        // GET api/values
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/values/5
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        // POST api/values
+  
         [HttpPost]
         public IHttpActionResult CreateUser([FromBody] CreateUserCommand command)
         {
@@ -39,25 +27,16 @@ namespace SoftTracerAPI.Controllers
 
         [HttpPost]
         [Route("~/api/users/authentication")]
-        public IHttpActionResult FindToken([FromBody] FindAuthenticationCommand command)
+        public IHttpActionResult AuthenticateUser([FromBody] FindAuthenticationCommand command)
         {
             if (command == null) { return BadRequest(DefaultMessages.InvalidBody); }
             ValidationError error = new FindTokenCommandValidator().Validate(command);
             if (error.IsInvalid) { return BadRequest(error.Error); }
             UsersRepository repository = new UsersRepository(Connection);
-            Authentication auth = repository.FindAuthentication(command);
-            if (auth == null) { return BadRequest("Usuário ou senha inválidos."); }
-            return Ok(auth);
+            Authentication authentication = repository.FindAuthentication(command);
+            if (authentication == null) { return BadRequest("Usuário ou senha inválidos."); }
+            return Ok(authentication);
         }
 
-        // PUT api/values/5
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        public void Delete(int id)
-        {
-        }
     }
 }

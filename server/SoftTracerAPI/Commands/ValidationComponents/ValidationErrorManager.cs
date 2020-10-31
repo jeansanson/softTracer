@@ -6,7 +6,7 @@ namespace SofTracerAPI.Commands
 {
     public class ValidationErrorManager
     {
-        private List<string> _errors;
+        private readonly List<string> _errors;
 
         public ValidationErrorManager()
         {

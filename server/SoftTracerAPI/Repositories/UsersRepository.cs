@@ -1,9 +1,9 @@
 ﻿using ExtensionMethods;
 using MySql.Data.MySqlClient;
 using SoftTracerAPI.Commands.Users;
+using SoftTracerAPI.Models;
 using System;
 using System.Data;
-using System.Reflection.Emit;
 using System.Text;
 
 namespace SoftTracerAPI.Repositories
@@ -82,7 +82,6 @@ namespace SoftTracerAPI.Repositories
 
         #endregion
 
-
         #region CreateUser
 
         public void CreateUser(CreateUserCommand model)
@@ -112,8 +111,6 @@ namespace SoftTracerAPI.Repositories
         }
 
         #endregion CreateUser
-
-
 
     }
 }
