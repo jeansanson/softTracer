@@ -11,7 +11,7 @@ namespace SoftTracerAPI.Repositories
     public class UsersRepository
 
     {
-        private MySqlConnection _connection;
+        private readonly  MySqlConnection _connection;
 
         public UsersRepository(MySqlConnection connection)
         {

@@ -2,8 +2,10 @@
 using SofTracerAPI.Controllers;
 using SoftTracerAPI.Commands.Users;
 using SoftTracerAPI.Repositories;
+using SoftTracerAPI.Models;
 using System.Collections.Generic;
 using System.Web.Http;
+using SoftTracerAPI.Misc;
 
 namespace SoftTracerAPI.Controllers
 {
@@ -25,10 +27,10 @@ namespace SoftTracerAPI.Controllers
         [HttpPost]
         public IHttpActionResult CreateUser([FromBody] CreateUserCommand command)
         {
-            if (command == null) { return BadRequest("Corpo da requisição inválida"); }
+            if (command == null) { return BadRequest(DefaultMessages.InvalidBody); }
             ValidationError error = new CreateUserCommandValidator().Validate(command);
             if (error.IsInvalid) { return BadRequest(error.Error); }
-            UsersRepository repository = new UsersRepository(_connection);
+            UsersRepository repository = new UsersRepository(Connection);
             if (repository.UserExists(command.UserId)) { return BadRequest("Já existe um usuário com este nome."); }
             if (repository.EmailExists(command.Email)) { return BadRequest("Já existe um usuário cadastrado neste e-mail."); }
             repository.CreateUser(command);
@@ -39,10 +41,10 @@ namespace SoftTracerAPI.Controllers
         [Route("~/api/users/authentication")]
         public IHttpActionResult FindToken([FromBody] FindAuthenticationCommand command)
         {
-            if (command == null) { return BadRequest("Corpo da requisição inválida"); }
+            if (command == null) { return BadRequest(DefaultMessages.InvalidBody); }
             ValidationError error = new FindTokenCommandValidator().Validate(command);
             if (error.IsInvalid) { return BadRequest(error.Error); }
-            UsersRepository repository = new UsersRepository(_connection);
+            UsersRepository repository = new UsersRepository(Connection);
             Authentication auth = repository.FindAuthentication(command);
             if (auth == null) { return BadRequest("Usuário ou senha inválidos."); }
             return Ok(auth);

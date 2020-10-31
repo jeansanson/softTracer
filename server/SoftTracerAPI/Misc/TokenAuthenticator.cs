@@ -9,7 +9,7 @@ using System.Web;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 
-namespace ExtensionMethods
+namespace SoftTracerAPI.Misc
 {
     public class TokenAuthenticator : AuthorizationFilterAttribute
     {
@@ -32,7 +32,7 @@ namespace ExtensionMethods
 
         private static void Validate(HttpActionContext actionContext, string token)
         {
-            MySqlConnection connection = new SoftTracerConnection().connection;
+            MySqlConnection connection = new SoftTracerConnection().Connection;
             UsersRepository repository = new UsersRepository(connection);
             string username = repository.FindUsernameByToken(new Guid(token));
             if (!string.IsNullOrEmpty(username))

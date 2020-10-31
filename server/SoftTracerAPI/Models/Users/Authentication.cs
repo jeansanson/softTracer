@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SoftTracerAPI.Commands.Users
+namespace SoftTracerAPI.Models
 {
     public class Authentication
     {
