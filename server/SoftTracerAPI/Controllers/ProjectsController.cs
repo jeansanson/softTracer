@@ -1,15 +1,25 @@
-﻿using SoftTracerAPI.Commands.Projects;
-using System.Collections.Generic;
+﻿using SofTracerAPI.Commands;
+using SofTracerAPI.Controllers;
+using SoftTracerAPI.Commands.Projects;
+using SoftTracerAPI.Misc;
+using SoftTracerAPI.Repositories;
+using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 
 namespace SoftTracerAPI.Controllers
 {
-    public class ProjectsController : ApiController
+    public class ProjectsController : BaseController
     {
-        //[HttpPost]
-        //public IHttpActionResult CreateProject([FromBody] CreateProjectCommand command)
-        //{
-
-        //}
+        [TokenAuthenticator]
+        [HttpPost]
+        public IHttpActionResult CreateProject([FromBody] CreateProjectCommand command)
+        {
+            if (command == null) { return BadRequest(DefaultMessages.InvalidBody); }
+            ValidationError error = new CreateProjectCommandValidator().Validate(command);
+            if (error.IsInvalid) { return BadRequest(error.Error); }
+            ProjectsRepository repository = new ProjectsRepository(Connection, HttpContext.Current.User);
+            return Ok(repository.CreateProject(command));
+        }
     }
 }

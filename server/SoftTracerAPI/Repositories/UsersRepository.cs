@@ -11,7 +11,7 @@ namespace SoftTracerAPI.Repositories
     public class UsersRepository
 
     {
-        private readonly  MySqlConnection _connection;
+        private readonly MySqlConnection _connection;
 
         public UsersRepository(MySqlConnection connection)
         {
@@ -19,50 +19,50 @@ namespace SoftTracerAPI.Repositories
         }
 
         #region UserExists
+
         public bool UserExists(string userId)
         {
             MySqlCommand command = new MySqlCommand($"SELECT COUNT(0) FROM users WHERE username={ Extensions.SqlString(userId)}", _connection);
             return int.Parse(command.ExecuteScalar().ToString()) > 0;
         }
 
-        #endregion
+        #endregion UserExists
 
         #region EmailExists
+
         public bool EmailExists(string email)
         {
             MySqlCommand command = new MySqlCommand($"SELECT COUNT(0) FROM users WHERE email={ Extensions.SqlString(email)}", _connection);
             return int.Parse(command.ExecuteScalar().ToString()) > 0;
         }
 
-        #endregion
+        #endregion EmailExists
 
         #region FindUsernameByToken
 
         public string FindUsernameByToken(Guid token)
         {
             MySqlCommand command = new MySqlCommand($"SELECT username FROM users WHERE token=@token", _connection);
-            command.Parameters.AddWithValue("@token", token);
+            command.Parameters.AddWithValue("@token", token).DbType = DbType.Guid;
             return command.ExecuteScalar().ToString();
         }
 
-        #endregion
+        #endregion FindUsernameByToken
 
         #region Authentication
 
- 
         public Authentication FindAuthentication(FindAuthenticationCommand model)
         {
             Authentication result = null;
             MySqlCommand command = new MySqlCommand($"SELECT username,displayName,email,token FROM users WHERE username=@username AND password=@password", _connection);
             command.Parameters.AddWithValue("@username", model.UserId);
             command.Parameters.AddWithValue("@password", Extensions.EncryptString(model.Password));
-            
-            using(IDataReader reader = command.ExecuteReader())
+
+            using (IDataReader reader = command.ExecuteReader())
             {
                 if (reader.Read())
                 {
                     result = PopulateAuthentition(reader);
-
                 }
             }
 
@@ -80,7 +80,7 @@ namespace SoftTracerAPI.Repositories
             };
         }
 
-        #endregion
+        #endregion Authentication
 
         #region CreateUser
 
@@ -111,6 +111,5 @@ namespace SoftTracerAPI.Repositories
         }
 
         #endregion CreateUser
-
     }
 }

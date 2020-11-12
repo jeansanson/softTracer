@@ -17,7 +17,7 @@ namespace SoftTracerAPI.Misc
         {
             if (IsAuthorizationHeaderEmpty(actionContext))
             {
-                SetUnauthorizedRepsponse(actionContext);
+                SetUnauthorizedResponse(actionContext);
             }
             else
             {
@@ -41,7 +41,7 @@ namespace SoftTracerAPI.Misc
             }
             else
             {
-                SetUnauthorizedRepsponse(actionContext);
+                SetUnauthorizedResponse(actionContext);
             }
             connection.Close();
         }
@@ -55,13 +55,13 @@ namespace SoftTracerAPI.Misc
         {
             if (token.Length != 36 && !(token.Split(new char[] { '-' }).Length == 4))
             {
-                SetUnauthorizedRepsponse(actionContext);
+                SetUnauthorizedResponse(actionContext);
                 return false;
             }
             return true;
         }
 
-        private static void SetUnauthorizedRepsponse(HttpActionContext actionContext)
+        private static void SetUnauthorizedResponse(HttpActionContext actionContext)
         {
             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized);
         }

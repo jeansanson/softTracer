@@ -2,7 +2,7 @@
 
 namespace SoftTracerAPI.Commands.Projects
 {
-    public class CreateUserCommandValidator : BaseValidator, IValidator<CreateProjectCommand>
+    public class CreateProjectCommandValidator : BaseValidator, IValidator<CreateProjectCommand>
     {
         public ValidationError Validate(CreateProjectCommand command)
         {
