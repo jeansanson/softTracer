@@ -7,15 +7,18 @@ CREATE TABLE `users` (
   PRIMARY KEY (`username`,`token`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `softracer`.`projects_users` (
-  `projectId` INT NOT NULL,
-  `username` INT NOT NULL,
-  PRIMARY KEY (`projectId`, `username`));
+CREATE TABLE `projects_users` (
+  `projectId` int NOT NULL,
+  `username` varchar(130) NOT NULL,
+  `role` int DEFAULT NULL,
+  PRIMARY KEY (`projectId`,`username`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-CREATE TABLE `softracer`.`projects` (
-  `projectId` INT NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(255) NULL,
-  `resume` VARCHAR(4092) NULL,
-  `openingDate` DATE NULL,
-  PRIMARY KEY (`projectId`));
-
+CREATE TABLE `projects` (
+  `projectId` int NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  `resume` varchar(4092) DEFAULT NULL,
+  `openingDate` datetime DEFAULT NULL,
+  `token` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`projectId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
