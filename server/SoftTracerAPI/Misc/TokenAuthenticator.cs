@@ -53,7 +53,7 @@ namespace SoftTracerAPI.Misc
 
         private static bool IsFormatValid(HttpActionContext actionContext, string token)
         {
-            if (token.Length != 36 && !(token.Split(new char[] { '-' }).Length == 4))
+            if (token.Length != 36 || !(token.Split(new char[] { '-' }).Length == 4))
             {
                 SetUnauthorizedResponse(actionContext);
                 return false;
