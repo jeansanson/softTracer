@@ -3,7 +3,6 @@ using SofTracerAPI.Controllers;
 using SoftTracerAPI.Commands.Projects;
 using SoftTracerAPI.Misc;
 using SoftTracerAPI.Repositories;
-using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 
@@ -21,5 +20,15 @@ namespace SoftTracerAPI.Controllers
             ProjectsRepository repository = new ProjectsRepository(Connection, HttpContext.Current.User);
             return Ok(repository.CreateProject(command));
         }
+
+        [TokenAuthenticator]
+        [HttpGet]
+        public IHttpActionResult FindProjects()
+        {
+            ProjectsRepository repository = new ProjectsRepository(Connection, HttpContext.Current.User);
+            return Ok(repository.FindProjects());
+        }
+
+
     }
 }

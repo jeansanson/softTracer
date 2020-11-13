@@ -2,6 +2,7 @@
 using SofTracerAPI.Models.Projects;
 using SoftTracerAPI.Commands.Projects;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Security.Principal;
 using System.Text;
@@ -29,7 +30,7 @@ namespace SoftTracerAPI.Repositories
             command.CommandText = GetCreateProjectCommandText();
             PopulateCreateProjectCommand(model, command, projectId);
             command.ExecuteNonQuery();
-            Project project = FindProjectById(projectId);
+            Project project = FindProject(projectId);
             AddUser(project.Token, UserRole.Administrator);
             return project;
         }
@@ -39,7 +40,7 @@ namespace SoftTracerAPI.Repositories
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
             command.Parameters.Add("@name", MySqlDbType.VarChar).Value = model.Name;
             command.Parameters.Add("@resume", MySqlDbType.VarChar).Value = model.Resume;
-            command.Parameters.Add("@openingDate", MySqlDbType.Date).Value = new DateTime();
+            command.Parameters.Add("@openingDate", MySqlDbType.DateTime).Value = DateTime.Now;
         }
 
         static private string GetCreateProjectCommandText()
@@ -54,7 +55,7 @@ namespace SoftTracerAPI.Repositories
 
         private int FindNextId()
         {
-            MySqlCommand command = new MySqlCommand($"SELECT MAX(projectId) + 1 FROM projects", _connection);
+            MySqlCommand command = new MySqlCommand($"SELECT IFNULL(MAX(projectId) + 1,1) FROM projects", _connection);
             return int.Parse(command.ExecuteScalar().ToString());
         }
 
@@ -62,7 +63,7 @@ namespace SoftTracerAPI.Repositories
 
         #region FindProject
 
-        public Project FindProjectById(int id)
+        public Project FindProject(int id)
         {
             Project result = null;
             MySqlCommand command = new MySqlCommand(GetFindProjectByIdQuery(), _connection);
@@ -72,7 +73,25 @@ namespace SoftTracerAPI.Repositories
             {
                 if (reader.Read())
                 {
-                    result = PopulateProject(reader, id);
+                    result = PopulateProject(reader);
+                }
+            }
+
+            return result;
+        }
+
+        public Project FindProject(Guid token)
+        {
+            int id = FindId(token);
+            Project result = null;
+            MySqlCommand command = new MySqlCommand(GetFindProjectByIdQuery(), _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = id;
+
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    result = PopulateProject(reader);
                 }
             }
 
@@ -82,12 +101,16 @@ namespace SoftTracerAPI.Repositories
         static private string GetFindProjectByIdQuery()
         {
             StringBuilder sql = new StringBuilder();
-            sql.AppendLine("SELECT name,resume,openingDate,token FROM projects");
+            sql.AppendLine("SELECT PRO.projectId");
+            sql.AppendLine(",PRO.name");
+            sql.AppendLine(",PRO.openingDate");
+            sql.AppendLine(",PRO.token");
+            sql.AppendLine(",PRO.resume FROM projects");
             sql.AppendLine("WHERE projectId=@projectId");
             return sql.ToString();
         }
 
-        private static Project PopulateProject(IDataReader reader, int id)
+        private static Project PopulateProject(IDataReader reader)
         {
             return new Project
             {
@@ -95,13 +118,48 @@ namespace SoftTracerAPI.Repositories
                 Resume = reader["resume"].ToString(),
                 Token = new Guid(reader["token"].ToString()),
                 OpeningDate = DateTime.Parse(reader["openingDate"].ToString()),
-                Id = id
+                Id = int.Parse(reader["projectId"].ToString())
             };
         }
 
         #endregion FindProject
 
+        #region FindProjects
+
+        public List<Project> FindProjects()
+        {
+            List<Project> result = new List<Project>();
+            MySqlCommand command = new MySqlCommand(GetFindProjectsQuery(), _connection);
+            command.Parameters.Add("@username", MySqlDbType.VarChar).Value = _username.Identity.Name;
+
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    result.Add(PopulateProject(reader));
+                }
+            }
+
+            return result;
+        }
+
+        static private string GetFindProjectsQuery()
+        {
+            StringBuilder sql = new StringBuilder();
+            sql.AppendLine("SELECT PRO.projectId");
+            sql.AppendLine(",PRO.name");
+            sql.AppendLine(",PRO.openingDate");
+            sql.AppendLine(",PRO.token");
+            sql.AppendLine(",PRO.resume FROM");
+            sql.AppendLine("projects PRO JOIN projects_users PU ON PRO.projectId=PU.projectId");
+            sql.AppendLine("WHERE PU.username=@username");
+            return sql.ToString();
+        }
+
+        #endregion FindProjects
+
         #region AddUser
+
         public void AddUser(Guid projectToken, UserRole role)
         {
             MySqlCommand command = _connection.CreateCommand();
@@ -128,14 +186,14 @@ namespace SoftTracerAPI.Repositories
         static private string GetAddUserCommandText()
         {
             StringBuilder sql = new StringBuilder();
-            sql.AppendLine("INSERT INTO projects_users").AppendLine();
-            sql.AppendLine("(projectId,username,role)").AppendLine();
+            sql.AppendLine("INSERT INTO projects_users");
+            sql.AppendLine("(projectId,username,role)");
             sql.AppendLine("VALUES").AppendLine();
-            sql.AppendLine("(@projectId,@username,@role");
+            sql.AppendLine("(@projectId,@username,@role)");
             return sql.ToString();
         }
 
-        #endregion
+        #endregion AddUser
 
         public Guid FindToken(int id)
         {
