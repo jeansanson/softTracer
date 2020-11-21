@@ -29,6 +29,5 @@ namespace SoftTracerAPI.Controllers
             return Ok(repository.FindProjects());
         }
 
-
     }
 }

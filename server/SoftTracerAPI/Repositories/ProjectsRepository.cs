@@ -105,8 +105,8 @@ namespace SoftTracerAPI.Repositories
             sql.AppendLine(",PRO.name");
             sql.AppendLine(",PRO.openingDate");
             sql.AppendLine(",PRO.token");
-            sql.AppendLine(",PRO.resume FROM projects");
-            sql.AppendLine("WHERE projectId=@projectId");
+            sql.AppendLine(",PRO.resume FROM projects PRO");
+            sql.AppendLine("WHERE PRO.projectId=@projectId");
             return sql.ToString();
         }
 

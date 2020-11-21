@@ -1,5 +1,4 @@
 ﻿using MySql.Data.MySqlClient;
-using SoftTracerAPI.Misc;
 using SoftTracerAPI.Repositories;
 using System;
 using System.Net;
@@ -53,7 +52,7 @@ namespace SoftTracerAPI.Misc
 
         private static bool IsFormatValid(HttpActionContext actionContext, string token)
         {
-            if (token.Length != 36 || !(token.Split(new char[] { '-' }).Length == 4))
+            if (token.Length != 36 || !(token.Split(new char[] { '-' }).Length == 5))
             {
                 SetUnauthorizedResponse(actionContext);
                 return false;
