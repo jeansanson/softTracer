@@ -18,6 +18,11 @@ namespace SofTracerAPI.Commands
             _errors.Add(error);
         }
 
+        public bool HasError(string error)
+        {
+            return _errors.Contains(error);
+        }
+
         public ValidationError GetError()
         {
             return new ValidationError(_errors);
