@@ -23,7 +23,7 @@
 x64/
 x86/
 bld/
-[Bb]in/
+
 [Oo]bj/
 [Ll]og/
 
@@ -274,7 +274,7 @@ __pycache__/
 
 ### DotnetCore ###
 # .NET Core build folders
-bin/
+
 obj/
 
 # Common node modules locations
