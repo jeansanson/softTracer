@@ -185,6 +185,8 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Commands\Projects\CreateProjectCommand.cs" />
     <Compile Include="Commands\Projects\CreateProjectCommandValidator.cs" />
+    <Compile Include="Commands\Projects\Requirements\UpdateRequirementsCommand.cs" />
+    <Compile Include="Commands\Projects\Requirements\UpdateRequirementsCommandValidator.cs" />
     <Compile Include="Commands\Projects\Requirements\CreateRequirementsCommandValidator.cs" />
     <Compile Include="Commands\Projects\Requirements\CreateRequirementsCommand.cs" />
     <Compile Include="Commands\Users\CreateUserCommandValidator.cs" />

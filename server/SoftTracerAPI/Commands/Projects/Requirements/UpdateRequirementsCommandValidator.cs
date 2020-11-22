@@ -2,18 +2,18 @@
 
 namespace SofTracerAPI.Commands.Projects.Requirements
 {
-    public class CreateRequirementsCommandValidator : BaseValidator, IValidator<List<CreateRequirementsCommand>>
+    public class UpdateRequirementsCommandValidator : BaseValidator, IValidator<List<UpdateRequirementsCommand>>
     {
-        public ValidationError Validate(List<CreateRequirementsCommand> command)
+        public ValidationError Validate(List<UpdateRequirementsCommand> command)
         {
-            foreach(CreateRequirementsCommand item in command)
+            foreach (UpdateRequirementsCommand item in command)
             {
-            ValidateCommand(item);
+                ValidateCommand(item);
             }
             return _manager.GetError();
         }
 
-        private void AddErrors(CreateRequirementsCommand command)
+        private void AddErrors(UpdateRequirementsCommand command)
         {
             if (string.IsNullOrWhiteSpace(command.Name))
             {
@@ -23,16 +23,17 @@ namespace SofTracerAPI.Commands.Projects.Requirements
                     _manager.AddError(namelessError);
                 }
             }
+            if (command.Id == 0) { _manager.AddError($"Id indefinido"); }
             if ($"{command.Name}".Length > 200) { _manager.AddError($"Nome '{command.Name}' possui muitos caracteres"); }
             if ($"{command.Description}".Length > 4000) { _manager.AddError($"Descrição do requisito '{command.Name}' possui muitos caracteres"); }
         }
 
-        private void ValidateCommand(CreateRequirementsCommand command)
+        private void ValidateCommand(UpdateRequirementsCommand command)
         {
             AddErrors(command);
             if (command.Children != null)
             {
-                foreach (CreateRequirementsCommand child in command.Children)
+                foreach (UpdateRequirementsCommand child in command.Children)
                 {
                     ValidateCommand(child);
                 }
