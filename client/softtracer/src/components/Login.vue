@@ -12,7 +12,11 @@
           label="Senha"
           :type="show1 ? 'text' : 'password'"
         ></v-text-field>
+
         <v-btn elevation="2" color="primary">Entrar</v-btn>
+        <v-btn elevation="2" color="primary" class="ml-2" @click="goToRegister"
+          >Cadastrar</v-btn
+        >
       </v-col>
     </v-row>
   </v-container>
@@ -22,6 +26,12 @@
 export default {
   name: "Login",
 
-  data: () => ({}),
+  data: () => ({show1: false}),
+  methods: {
+    login() {},
+    goToRegister() {
+      this.$router.push("/register");
+    },
+  },
 };
 </script>
