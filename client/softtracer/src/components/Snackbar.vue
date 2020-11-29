@@ -1,7 +1,7 @@
 <template>
   <v-snackbar v-model="show" :color="color" :timeout="timeout">
     {{ message }}
-    <v-btn text @click="show = false" class="text-right">Close</v-btn>
+    <v-btn text @click="show = false" class="text-right">Fechar</v-btn>
   </v-snackbar>
 </template>
 
@@ -19,8 +19,8 @@ export default {
   created() {
     this.$store.subscribe((mutation, state) => {
       if (mutation.type === "showMessage") {
-        this.message = state.content;
-        this.color = state.color;
+        this.message = state.snackbar_content;
+        this.color = state.snackbar_color;
         this.show = true;
       }
     });

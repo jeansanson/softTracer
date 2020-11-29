@@ -44,20 +44,13 @@
             color="primary"
             class="mr-4"
             @click="validate"
+            type="submit"
           >
             Cadastrar
           </v-btn>
 
           <v-btn elevation="2" color="secondary" @click="goToLogin"
             >Voltar</v-btn
-          >
-
-          <v-btn
-            elevation="2"
-            color="secondary"
-            class="ml-4"
-            @click="showSnackbar"
-            >Snackbar test</v-btn
           >
         </v-form>
       </v-col>
@@ -106,7 +99,7 @@ export default {
         userId: this.user,
         displayname: this.name,
         email: this.email,
-        password: this.email,
+        password: this.password,
       };
 
       const options = {
@@ -118,13 +111,26 @@ export default {
         },
       };
 
+      let self = this;
+
       axios
         .post(URL, data, options)
         .then(function(response) {
           console.log(response);
+          self.$snackbar.showMessage({
+            content: "Usuário cadastrado com sucesso!",
+            color: "success",
+          });
+          self.goToLogin();
         })
         .catch(function(error) {
-          console.log(error);
+          console.log(error.message);
+          if (error.response.data.Message !== "") {
+            self.$snackbar.showMessage({
+              content: error.response.data.Message,
+              color: "error",
+            });
+          }
         });
     },
 
@@ -134,10 +140,6 @@ export default {
       if (this.valid) {
         this.register();
       }
-    },
-
-    showSnackbar() {
-      this.$snackbar.showMessage({ content: "teste", color: "secondary" });
     },
 
     // Route related methods

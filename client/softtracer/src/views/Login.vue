@@ -7,7 +7,7 @@
           Login
         </h1>
 
-        <v-form ref="form" v-model="valid" lazy-validation>
+        <v-form ref="form" v-model="valid" lazy-validation >
           <v-text-field
             v-model="user"
             :rules="userRules"
@@ -28,17 +28,14 @@
             color="primary"
             class="mr-4"
             @click="validate"
+            type="submit"
           >
             Entrar
           </v-btn>
 
-          <v-btn
-            elevation="2"
-            color="secondary"
-            @click="goToRegister"
+          <v-btn elevation="2" color="secondary" @click="goToRegister"
             >Criar uma conta</v-btn
           >
-          
         </v-form>
       </v-col>
     </v-row>
@@ -72,8 +69,8 @@ export default {
       const URL = "https://localhost:44342/api/users/authentication";
 
       const data = {
-        userId: this.user,
-        password: this.email,
+        UserId: this.user,
+        password: this.password,
       };
 
       const options = {
@@ -82,17 +79,28 @@ export default {
           "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
           "Access-Control-Allow-Headers":
             "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
+          "Content-Type": "application/json",
         },
       };
+
+      let self = this;
 
       axios
         .post(URL, data, options)
         .then(function(response) {
-          console.log(response);
+          console.log(response.data);
+          self.$store.commit("storeLogin", response.data);
+          self.$snackbar.showMessage({ content: "Login realizado com sucesso!", color: "success" });
+          self.goToProjects();
         })
         .catch(function(error) {
-          console.log(error);
-          this.error = error;
+          console.log(error.response.data.Message);
+          if (error.response.data.Message !== "") {
+            self.$snackbar.showMessage({
+              content: error.response.data.Message,
+              color: "error",
+            });
+          }
         });
     },
 
@@ -100,7 +108,6 @@ export default {
       this.$refs.form.validate();
 
       if (this.valid) {
-        console.log("válido!");
         this.login();
       }
     },
@@ -109,6 +116,10 @@ export default {
     goToRegister() {
       this.$router.push("/register");
     },
+
+    goToProjects() {
+      this.$router.push("/projects");
+    }
   },
 };
 </script>
