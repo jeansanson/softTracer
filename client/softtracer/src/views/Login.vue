@@ -88,7 +88,7 @@ export default {
       axios
         .post(URL, data, options)
         .then(function(response) {
-          console.log(response.data);
+          //console.log(response.data);
           self.$store.commit("storeLogin", response.data);
           self.$snackbar.showMessage({ content: "Login realizado com sucesso!", color: "success" });
           self.goToProjects();
@@ -119,6 +119,11 @@ export default {
 
     goToProjects() {
       this.$router.push("/projects");
+    }
+  },
+  created: function() {
+    if (this.$store.state.user_token !== "") {
+      this.goToProjects();
     }
   },
 };

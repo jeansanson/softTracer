@@ -101,16 +101,17 @@ export default {
 
       axios
         .post(URL, data, options)
-        .then(function(response) {
-          console.log(response.data);
+        .then(function() { //response
+          //console.log(response.data);
           self.$snackbar.showMessage({
             content: "Projeto criado com sucesso!",
             color: "success",
           });
+          self.$store.commit("refreshProjects");
           self.close();
         })
         .catch(function(error) {
-          console.log(error.response.data.Message);
+          console.log(error);
           if (error.response.data.Message !== "") {
             self.$snackbar.showMessage({
               content: error.response.data.Message,

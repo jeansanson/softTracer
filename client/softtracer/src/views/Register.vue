@@ -146,6 +146,15 @@ export default {
     goToLogin() {
       this.$router.push("/login");
     },
+
+    goToProjects() {
+      this.$router.push("/projects");
+    }
+  },
+  created: function() {
+    if (this.$store.state.user_token !== "") {
+      this.goToProjects();
+    }
   },
 };
 </script>

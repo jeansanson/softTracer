@@ -10,10 +10,10 @@
       <div class="mr-1" v-if="this.$store.state.user_token !== ''">
         <v-icon>mdi-account-circle</v-icon>
       </div>
-      <h4 class="mr-5" >{{ this.$store.state.name }}</h4>
+      <h4 class="mr-5" >{{ this.$store.state.user_name }}</h4>
       <div class="mr-2" v-if="this.$store.state.user_token !== ''">
         <v-row>
-          <v-btn elevation="0" @click="logout">
+          <v-btn elevation="0" @click="logout" >
             <h4 class="mr-2">Sair</h4>
             <v-icon>mdi-exit-to-app</v-icon>
           </v-btn>
