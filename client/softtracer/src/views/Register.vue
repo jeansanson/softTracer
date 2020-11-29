@@ -4,14 +4,30 @@
       <v-col cols="12" sm="4"></v-col>
       <v-col cols="12" sm="4">
         <h1 class="display-1 font-weight-bold mb-3">
-          Login
+          Crie uma conta
         </h1>
 
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-text-field
             v-model="user"
+            :counter="100"
             :rules="userRules"
             label="Usuário"
+            required
+          ></v-text-field>
+
+          <v-text-field
+            v-model="name"
+            :counter="100"
+            :rules="nameRules"
+            label="Nome"
+            required
+          ></v-text-field>
+
+          <v-text-field
+            v-model="email"
+            :rules="emailRules"
+            label="E-mail"
             required
           ></v-text-field>
 
@@ -29,16 +45,20 @@
             class="mr-4"
             @click="validate"
           >
-            Entrar
+            Cadastrar
           </v-btn>
+
+          <v-btn elevation="2" color="secondary" @click="goToLogin"
+            >Voltar</v-btn
+          >
 
           <v-btn
             elevation="2"
             color="secondary"
-            @click="goToRegister"
-            >Criar uma conta</v-btn
+            class="ml-4"
+            @click="showSnackbar"
+            >Snackbar test</v-btn
           >
-          
         </v-form>
       </v-col>
     </v-row>
@@ -49,7 +69,7 @@
 const axios = require("axios");
 
 export default {
-  name: "Login",
+  name: "Register",
 
   data: () => ({
     valid: true,
@@ -59,6 +79,16 @@ export default {
       (v) =>
         (v && v.length <= 100) || "Usuário deve ter menos que 100 caracteres",
     ],
+    name: "",
+    nameRules: [
+      (v) => !!v || "Nome é um campo necessário",
+      (v) => (v && v.length <= 100) || "Nome deve ter menos que 100 caracteres",
+    ],
+    email: "",
+    emailRules: [
+      (v) => !!v || "E-mail é um campo necessário",
+      (v) => /.+@.+\..+/.test(v) || "O e-mail precisa ser válido",
+    ],
     password: "",
     passwordRules: [
       (v) => !!v || "Senha é um campo necessário",
@@ -67,12 +97,15 @@ export default {
     ],
     error: "",
   }),
+
   methods: {
-    login() {
-      const URL = "https://localhost:44342/api/users/authentication";
+    register() {
+      const URL = "https://localhost:44342/api/users";
 
       const data = {
         userId: this.user,
+        displayname: this.name,
+        email: this.email,
         password: this.email,
       };
 
@@ -92,7 +125,6 @@ export default {
         })
         .catch(function(error) {
           console.log(error);
-          this.error = error;
         });
     },
 
@@ -100,15 +132,20 @@ export default {
       this.$refs.form.validate();
 
       if (this.valid) {
-        console.log("válido!");
-        this.login();
+        this.register();
       }
     },
 
+    showSnackbar() {
+      this.$snackbar.showMessage({ content: "teste", color: "secondary" });
+    },
+
     // Route related methods
-    goToRegister() {
-      this.$router.push("/register");
+    goToLogin() {
+      this.$router.push("/login");
     },
   },
 };
 </script>
+
+<style></style>
