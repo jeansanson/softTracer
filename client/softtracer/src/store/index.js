@@ -6,11 +6,17 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: { snackbar_content: "", snackbar_color: "", name: "", email: "", user_token: "",  user_id: ""},
   mutations: {
+    // Show snackbar
     showMessage(state, payload) {
       state.snackbar_content = payload.content;
       state.snackbar_color = payload.color;
     },
 
+    showCreateProject(){
+
+    },
+
+    // Login credentials
     storeLogin(state, payload) {
       state.name = payload.DisplayName;
       state.email = payload.Email;
