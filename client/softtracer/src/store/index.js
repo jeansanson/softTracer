@@ -11,6 +11,7 @@ export default new Vuex.Store({
     user_email: "",
     user_token: "",
     user_id: "",
+    apiURL: "",
   },
   mutations: {
     // Show snackbar
@@ -50,7 +51,8 @@ export default new Vuex.Store({
       (state.user_name = localStorage.getItem("user_name")),
         (state.user_email = localStorage.getItem("user_email")),
         (state.user_token = localStorage.getItem("user_token")),
-        (state.user_id = localStorage.getItem("user_id"));
+        (state.user_id = localStorage.getItem("user_id")),
+        (state.apiURL = "https://localhost:44342/api");
     },
   },
   actions: {},

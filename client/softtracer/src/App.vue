@@ -6,7 +6,7 @@
       </v-col>
 
       <v-spacer></v-spacer>
-
+      
       <div class="mr-1" v-if="this.$store.state.user_token !== ''">
         <v-icon>mdi-account-circle</v-icon>
       </div>

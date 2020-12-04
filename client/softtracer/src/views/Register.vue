@@ -93,7 +93,7 @@ export default {
 
   methods: {
     register() {
-      const URL = "https://localhost:44342/api/users";
+      const URL = self.$store.state.apiURL + "/users";
 
       const data = {
         userId: this.user,
@@ -102,21 +102,11 @@ export default {
         password: this.password,
       };
 
-      const options = {
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
-          "Access-Control-Allow-Headers":
-            "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
-        },
-      };
-
       let self = this;
 
       axios
-        .post(URL, data, options)
-        .then(function(response) {
-          console.log(response);
+        .post(URL, data)
+        .then(function() {
           self.$snackbar.showMessage({
             content: "Usuário cadastrado com sucesso!",
             color: "success",
@@ -124,7 +114,6 @@ export default {
           self.goToLogin();
         })
         .catch(function(error) {
-          console.log(error.message);
           if (error.response.data.Message !== "") {
             self.$snackbar.showMessage({
               content: error.response.data.Message,

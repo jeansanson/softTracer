@@ -10,7 +10,7 @@
             <v-text-field
               v-model="name"
               :rules="nameRules"
-              :counter="100"
+              :counter="255"
               label="Nome do projeto"
               required
             ></v-text-field>
@@ -56,7 +56,7 @@ export default {
     name: "",
     nameRules: [
       (v) => !!v || "Nome é um campo necessário",
-      (v) => (v && v.length <= 100) || "Nome deve ter menos que 100 caracteres",
+      (v) => (v && v.length <= 255) || "Nome deve ter menos que 100 caracteres",
     ],
     resume: "",
     resumeRules: [
@@ -81,7 +81,7 @@ export default {
 
     createProject() {
       let self = this;
-      const URL = "https://localhost:44342/api/projects";
+      const URL = self.$store.state.apiURL + "/projects";
 
       const data = {
         name: this.name,
@@ -90,19 +90,13 @@ export default {
 
       const options = {
         headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
-          "Access-Control-Allow-Headers":
-            "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
-          "Content-Type": "application/json",
           Authorization: self.$store.state.user_token,
         },
       };
 
       axios
         .post(URL, data, options)
-        .then(function() { //response
-          //console.log(response.data);
+        .then(function() {
           self.$snackbar.showMessage({
             content: "Projeto criado com sucesso!",
             color: "success",

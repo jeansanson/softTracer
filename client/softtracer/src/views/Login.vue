@@ -7,7 +7,7 @@
           Login
         </h1>
 
-        <v-form ref="form" v-model="valid" lazy-validation >
+        <v-form ref="form" v-model="valid" lazy-validation>
           <v-text-field
             v-model="user"
             :rules="userRules"
@@ -66,7 +66,8 @@ export default {
   }),
   methods: {
     login() {
-      const URL = "https://localhost:44342/api/users/authentication";
+      let self = this;
+      const URL = self.$store.state.apiURL + "/users/authentication";
 
       const data = {
         UserId: this.user,
@@ -75,22 +76,20 @@ export default {
 
       const options = {
         headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
-          "Access-Control-Allow-Headers":
-            "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
           "Content-Type": "application/json",
         },
       };
 
-      let self = this;
+      
 
       axios
         .post(URL, data, options)
         .then(function(response) {
-          //console.log(response.data);
           self.$store.commit("storeLogin", response.data);
-          self.$snackbar.showMessage({ content: "Login realizado com sucesso!", color: "success" });
+          self.$snackbar.showMessage({
+            content: "Login realizado com sucesso!",
+            color: "success",
+          });
           self.goToProjects();
         })
         .catch(function(error) {
@@ -119,7 +118,7 @@ export default {
 
     goToProjects() {
       this.$router.push("/projects");
-    }
+    },
   },
   created: function() {
     if (this.$store.state.user_token !== "") {

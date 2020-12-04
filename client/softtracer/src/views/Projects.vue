@@ -8,29 +8,16 @@
       >
     </v-row>
     <v-row dense>
-      <v-col v-for="project in projects" :key="project.Id" :cols="2">
-        <v-card @click="console.log('')" height="190px">
+      <v-col v-for="project in projects" :key="project.Id" :cols="cols">
+        <v-card @click="loadProject(project)" height="190px">
           <v-card-title
             v-text="project.Name"
-            class="justify-center"
+            class="justify-center project-title"
           ></v-card-title>
         </v-card>
       </v-col>
     </v-row>
 
-    <!-- <v-fab-transition>
-      <v-btn
-        color="primary"
-        dark
-        absolute
-        bottom
-        right
-        fab
-        @click="openCreateProject"
-      >
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </v-fab-transition> -->
     <CreateProjectDialog />
   </v-container>
 </template>
@@ -52,48 +39,51 @@ export default {
     } else {
       this.loadProjects();
       this.$store.subscribe((mutation) => {
-      if (mutation.type === "refreshProjects") {
-        this.loadProjects();
-      }
-    });
+        if (mutation.type === "refreshProjects") {
+          this.loadProjects();
+        }
+      });
     }
+  },
+  computed: {
+    cols() {
+      switch (this.$vuetify.breakpoint.name) {
+        case "xs":
+          return 6;
+        case "sm":
+          return 4;
+        case "md":
+          return 4;
+        case "lg":
+          return 3;
+        case "xl":
+          return 2;
+        default:
+          return 3;
+      }
+    },
   },
   methods: {
     loadProjects() {
       let self = this;
-      const URL = "https://localhost:44342/api/projects";
+      const URL = self.$store.state.apiURL + "/projects";
 
       const options = {
         headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
-          "Access-Control-Allow-Headers":
-            "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With",
-          "Content-Type": "application/json",
           Authorization: self.$store.state.user_token,
         },
       };
 
       axios.get(URL, options).then((resp) => {
-        //this.results = resp.data.results;
-        //const entries = Object.keys(resp.data.results.stocks);
-        //const stocks = [];
-        console.log(resp.data);
         self.projects = resp.data;
-        // entries.forEach((element) => {
-        //   const stock = resp.data.results.stocks[element];
-        //   stocks.push({
-        //     title: element,
-        //     location: stock.location,
-        //     value: stock.variation,
-        //   });
-        // });
-        // this.stocks = stocks;
-        // console.log(this.stocks);
       });
     },
 
-    // abre o popup para criar projetos
+    loadProject(project) {
+      console.log(project);
+    },
+
+    // Route related methods
     openCreateProject() {
       this.$store.commit("showCreateProject");
     },
@@ -101,4 +91,12 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.project-title {
+  height: 175px;
+  overflow: hidden;
+  white-space: pre-line;
+  word-break: keep-all;
+  text-align: center;
+}
+</style>
