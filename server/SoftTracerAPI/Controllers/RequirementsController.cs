@@ -44,6 +44,24 @@ namespace SoftTracerAPI.Controllers
             return Ok();
         }
 
+        [TokenAuthenticator]
+        [HttpPut]
+        [Route("~/api/projects/{projectId}/requirements/{requirementId}")]
+        public IHttpActionResult CreateUpdateRequirements([FromUri] int projectId, [FromBody] UpdateRequirementsCommand command)
+        {
+            if (command == null || projectId <= 0) { return BadRequest(DefaultMessages.InvalidBody); }
+            List<UpdateRequirementsCommand> commands = new List<UpdateRequirementsCommand>() { command };
+            ValidationError error = new UpdateRequirementsCommandValidator().Validate(commands);
+            if (error.IsInvalid) { return BadRequest(error.Error); }
+            ProjectsRepository projectsRepository = new ProjectsRepository(Connection, HttpContext.Current.User);
+            if (projectsRepository.FindProject(projectId) == null) { return BadRequest("Projeto não encontrado."); }
+            List<Requirement> requirements = new RequirementsService().MapCommand(commands);
+            RequirementsRepository repository = new RequirementsRepository(Connection);
+            repository.UpdateRequirements(projectId, requirements);
+            return Ok();
+        }
+
+
 
         [TokenAuthenticator]
         [HttpGet]
