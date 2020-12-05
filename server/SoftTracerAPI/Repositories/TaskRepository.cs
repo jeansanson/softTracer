@@ -10,39 +10,39 @@ using ExtensionMethods;
 
 namespace SoftTracerAPI.Repositories
 {
-    public class RequirementsRepository
+    public class TaskRepository
 
     {
         private readonly MySqlConnection _connection;
 
-        public RequirementsRepository(MySqlConnection connection)
+        public TaskRepository(MySqlConnection connection)
         {
             _connection = connection;
         }
 
         #region CreateRequirements
 
-        public void Create(int projectId, List<CreateRequirementsCommand> command)
+        public void CreateRequirements(int projectId, List<CreateRequirementsCommand> command)
         {
             List<Requirement> requirements = new RequirementsService().MapCommand(command);
-            Delete(projectId);
+            DeleteRequirement(projectId);
             foreach (Requirement requirement in requirements)
             {
-                Create(projectId, requirement);
+                CreteRequirement(projectId, requirement);
                 if (requirement.Children != null)
                 {
                     foreach (Requirement childRequirement in requirement.Children)
                     {
-                        Create(projectId, childRequirement);
+                        CreteRequirement(projectId, childRequirement);
                     }
                 }
             }
         }
 
-        private void Create(int projectId, Requirement requirement)
+        private void CreteRequirement(int projectId, Requirement requirement)
         {
             MySqlCommand command = _connection.CreateCommand();
-            command.CommandText = GetCreateQuery();
+            command.CommandText = GetCreateRequirementQuery();
             PopulateCreateCommand(projectId, requirement, command);
             command.ExecuteNonQuery();
         }
@@ -57,7 +57,7 @@ namespace SoftTracerAPI.Repositories
             command.Parameters.Add("@parentId", MySqlDbType.Int32).Value = requirement.ParentId;
         }
 
-        private string GetCreateQuery()
+        private string GetCreateRequirementQuery()
         {
             StringBuilder sql = new StringBuilder();
             sql.AppendLine("INSERT INTO requirements (");
@@ -81,7 +81,7 @@ namespace SoftTracerAPI.Repositories
 
         #region DeleteRequirements
 
-        public void Delete(int projectId, int requirementId)
+        public void DeleteRequirement(int projectId, int requirementId)
         {
             MySqlCommand command = _connection.CreateCommand();
             command.CommandText = "DELETE FROM requirements WHERE projectId=@projectId AND requirementId=@requirementId OR parentId=@parentId";
@@ -91,7 +91,7 @@ namespace SoftTracerAPI.Repositories
             command.ExecuteNonQuery();
         }
 
-        public void Delete(int projectId)
+        public void DeleteRequirement(int projectId)
         {
             MySqlCommand command = _connection.CreateCommand();
             command.CommandText = "DELETE FROM requirements WHERE projectId=@projectId";
@@ -107,13 +107,13 @@ namespace SoftTracerAPI.Repositories
         {
             foreach (Requirement requirement in requirements)
             {
-                Delete(projectId, requirement.Id);
-                Create(projectId, requirement);
+                DeleteRequirement(projectId, requirement.Id);
+                CreteRequirement(projectId, requirement);
                 if (requirement.Children == null) return;
                 foreach (Requirement childRequirement in requirement.Children)
                 {
-                    Delete(projectId, childRequirement.Id);
-                    Create(projectId, childRequirement);
+                    DeleteRequirement(projectId, childRequirement.Id);
+                    CreteRequirement(projectId, childRequirement);
                 }
             }
         }
@@ -122,21 +122,21 @@ namespace SoftTracerAPI.Repositories
 
         #region FindRequirements
 
-        public List<Requirement> Find(int projectId)
+        public List<Requirement> FindRequirements(int projectId)
         {
             List<Requirement> everyRequirement = new List<Requirement>();
-            FindRequirements(projectId, everyRequirement);
+            FindAllRequirements(projectId, everyRequirement);
             return everyRequirement.Where(item => item.ParentId == 0).ToList();
         }
 
-        public Requirement Find(int projectId, int requirementId)
+        public Requirement FindRequirement(int projectId, int requirementId)
         {
             List<Requirement> everyRequirement = new List<Requirement>();
-            FindRequirements(projectId, everyRequirement);
+            FindAllRequirements(projectId, everyRequirement);
             return everyRequirement.FirstOrDefault(item => item.Id == requirementId);
         }
 
-        private void FindRequirements(int projectId, List<Requirement> everyRequirement)
+        private void FindAllRequirements(int projectId, List<Requirement> everyRequirement)
         {
             MySqlCommand command = new MySqlCommand(GetFindRequirementsQuery(), _connection);
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;

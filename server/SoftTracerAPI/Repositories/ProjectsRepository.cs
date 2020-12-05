@@ -23,19 +23,19 @@ namespace SoftTracerAPI.Repositories
 
         #region CreateProject
 
-        public Project CreateProject(CreateProjectCommand model)
+        public Project Create(CreateProjectCommand model)
         {
             int projectId = FindNextId();
             MySqlCommand command = _connection.CreateCommand();
-            command.CommandText = GetCreateProjectCommandText();
-            PopulateCreateProjectCommand(model, command, projectId);
+            command.CommandText = GetCreateCommandText();
+            PopulateCreateCommand(model, command, projectId);
             command.ExecuteNonQuery();
-            Project project = FindProject(projectId);
+            Project project = Find(projectId);
             AddUser(project.Token, UserRole.Administrator);
             return project;
         }
 
-        private void PopulateCreateProjectCommand(CreateProjectCommand model, MySqlCommand command, int projectId)
+        private void PopulateCreateCommand(CreateProjectCommand model, MySqlCommand command, int projectId)
         {
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
             command.Parameters.Add("@name", MySqlDbType.VarChar).Value = model.Name;
@@ -43,7 +43,7 @@ namespace SoftTracerAPI.Repositories
             command.Parameters.Add("@openingDate", MySqlDbType.DateTime).Value = DateTime.Now;
         }
 
-        static private string GetCreateProjectCommandText()
+        static private string GetCreateCommandText()
         {
             StringBuilder sql = new StringBuilder();
             sql.AppendLine("INSERT INTO projects").AppendLine();
@@ -63,7 +63,7 @@ namespace SoftTracerAPI.Repositories
 
         #region FindProject
 
-        public Project FindProject(int id)
+        public Project Find(int id)
         {
             Project result = null;
             MySqlCommand command = new MySqlCommand(GetFindProjectByIdQuery(), _connection);
@@ -80,7 +80,7 @@ namespace SoftTracerAPI.Repositories
             return result;
         }
 
-        public Project FindProject(Guid token)
+        public Project Find(Guid token)
         {
             int id = FindId(token);
             Project result = null;
@@ -126,7 +126,7 @@ namespace SoftTracerAPI.Repositories
 
         #region FindProjects
 
-        public List<Project> FindProjects()
+        public List<Project> Find()
         {
             List<Project> result = new List<Project>();
             MySqlCommand command = new MySqlCommand(GetFindProjectsQuery(), _connection);

@@ -84,7 +84,7 @@ namespace SoftTracerAPI.Repositories
 
         #region CreateUser
 
-        public void CreateUser(CreateUserCommand model)
+        public void Create(CreateUserCommand model)
         {
             MySqlCommand command = _connection.CreateCommand();
             command.CommandText = GetCreateUserCommandText();

@@ -20,7 +20,7 @@ namespace SoftTracerAPI.Controllers
             UsersRepository repository = new UsersRepository(Connection);
             if (repository.UserExists(command.UserId)) { return BadRequest("Já existe um usuário com este nome."); }
             if (repository.EmailExists(command.Email)) { return BadRequest("Já existe um usuário cadastrado neste e-mail."); }
-            repository.CreateUser(command);
+            repository.Create(command);
             return Ok();
         }
 

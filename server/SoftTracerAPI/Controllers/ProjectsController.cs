@@ -18,7 +18,7 @@ namespace SoftTracerAPI.Controllers
             ValidationError error = new CreateProjectCommandValidator().Validate(command);
             if (error.IsInvalid) { return BadRequest(error.Error); }
             ProjectsRepository repository = new ProjectsRepository(Connection, HttpContext.Current.User);
-            return Ok(repository.CreateProject(command));
+            return Ok(repository.Create(command));
         }
 
         [TokenAuthenticator]
@@ -26,7 +26,7 @@ namespace SoftTracerAPI.Controllers
         public IHttpActionResult FindProjects()
         {
             ProjectsRepository repository = new ProjectsRepository(Connection, HttpContext.Current.User);
-            return Ok(repository.FindProjects());
+            return Ok(repository.Find());
         }
 
     }

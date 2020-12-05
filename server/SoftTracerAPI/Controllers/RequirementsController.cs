@@ -22,9 +22,9 @@ namespace SoftTracerAPI.Controllers
             ValidationError error = new CreateRequirementsCommandValidator().Validate(command);
             if (error.IsInvalid) { return BadRequest(error.Error); }
             ProjectsRepository projectsRepository = new ProjectsRepository(Connection, HttpContext.Current.User);
-            if (projectsRepository.FindProject(projectId) == null) { return BadRequest("Projeto não encontrado."); }
+            if (projectsRepository.Find(projectId) == null) { return BadRequest("Projeto não encontrado."); }
             RequirementsRepository repository = new RequirementsRepository(Connection);
-            repository.CreateRequirements(projectId, command);
+            repository.Create(projectId, command);
             return Ok();
         }
 
@@ -37,7 +37,7 @@ namespace SoftTracerAPI.Controllers
             ValidationError error = new UpdateRequirementsCommandValidator().Validate( command);
             if (error.IsInvalid) { return BadRequest(error.Error); }
             ProjectsRepository projectsRepository = new ProjectsRepository(Connection, HttpContext.Current.User);
-            if (projectsRepository.FindProject(projectId) == null) { return BadRequest("Projeto não encontrado."); }
+            if (projectsRepository.Find(projectId) == null) { return BadRequest("Projeto não encontrado."); }
             List<Requirement> requirements = new RequirementsService().MapCommand(command);
             RequirementsRepository repository = new RequirementsRepository(Connection);
             repository.UpdateRequirements(projectId, requirements);
@@ -54,7 +54,7 @@ namespace SoftTracerAPI.Controllers
             ValidationError error = new UpdateRequirementsCommandValidator().Validate(commands);
             if (error.IsInvalid) { return BadRequest(error.Error); }
             ProjectsRepository projectsRepository = new ProjectsRepository(Connection, HttpContext.Current.User);
-            if (projectsRepository.FindProject(projectId) == null) { return BadRequest("Projeto não encontrado."); }
+            if (projectsRepository.Find(projectId) == null) { return BadRequest("Projeto não encontrado."); }
             List<Requirement> requirements = new RequirementsService().MapCommand(commands);
             RequirementsRepository repository = new RequirementsRepository(Connection);
             repository.UpdateRequirements(projectId, requirements);
@@ -70,9 +70,9 @@ namespace SoftTracerAPI.Controllers
         {
             if (projectId <= 0) { return BadRequest(DefaultMessages.InvalidBody); }
             ProjectsRepository projectsRepository = new ProjectsRepository(Connection, HttpContext.Current.User);
-            if (projectsRepository.FindProject(projectId) == null) { return BadRequest("Projeto não encontrado."); }
+            if (projectsRepository.Find(projectId) == null) { return BadRequest("Projeto não encontrado."); }
             RequirementsRepository repository = new RequirementsRepository(Connection);
-            return Ok(repository.FindRequirements(projectId));
+            return Ok(repository.Find(projectId));
         }
 
     }
