@@ -22,3 +22,13 @@ CREATE TABLE `projects` (
   `token` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`projectId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+
+CREATE TABLE `requirements` (
+  `projectId` INT NOT NULL,
+  `requirementId` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `description` VARCHAR(45) NULL,
+  `completed` BIT(1) NULL,
+  `parentId` INT NULL,
+  PRIMARY KEY (`projectId`, `requirementId`));

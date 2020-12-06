@@ -21,7 +21,7 @@ namespace SoftTracerAPI.Repositories
             _username = username;
         }
 
-        #region CreateProject
+        #region Create
 
         public Project Create(CreateProjectCommand model)
         {
@@ -61,7 +61,7 @@ namespace SoftTracerAPI.Repositories
 
         #endregion CreateProject
 
-        #region FindProject
+        #region Find
 
         public Project Find(int id)
         {
@@ -122,10 +122,6 @@ namespace SoftTracerAPI.Repositories
             };
         }
 
-        #endregion FindProject
-
-        #region FindProjects
-
         public List<Project> Find()
         {
             List<Project> result = new List<Project>();
@@ -156,7 +152,7 @@ namespace SoftTracerAPI.Repositories
             return sql.ToString();
         }
 
-        #endregion FindProjects
+        #endregion Find
 
         #region AddUser
 

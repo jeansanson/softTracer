@@ -15,7 +15,7 @@ namespace SoftTracerAPI.Controllers
     {
         [TokenAuthenticator]
         [HttpPost]
-        public IHttpActionResult CreateUser([FromBody] CreateTaskCommand command)
+        public IHttpActionResult CreateTask([FromBody] CreateTaskCommand command)
         {
             if (command == null) { return BadRequest(DefaultMessages.InvalidBody); }
             ValidationError error = new CreateTaskCommandValidator().Validate(command);
@@ -27,8 +27,8 @@ namespace SoftTracerAPI.Controllers
 
             if(command.RequirementId > 0)
             {
-                RequirementsRepository requirements = new RequirementsRepository(Connection);
-                Requirement requirement = requirements.Find(command.ProjectId, command.RequirementId);
+                RequirementsRepository requirementsRepository = new RequirementsRepository(Connection);
+                Requirement requirement = requirementsRepository.Find(command.ProjectId, command.RequirementId);
                 if(requirement == null ) { return BadRequest("Requisito não encontrado neste projeto."); }
             }
       

@@ -1,12 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
-using SofTracerAPI.Commands.Projects.Requirements;
-using SofTracerAPI.Models.Projects.Requirements;
-using SofTracerAPI.Services;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Text;
-using ExtensionMethods;
+using SofTracerAPI.Commands.Tasks;
 
 namespace SoftTracerAPI.Repositories
 {
@@ -20,173 +14,89 @@ namespace SoftTracerAPI.Repositories
             _connection = connection;
         }
 
-        #region CreateRequirements
+        #region Create
 
-        public void CreateRequirements(int projectId, List<CreateRequirementsCommand> command)
+        public void Create(CreateTaskCommand model)
         {
-            List<Requirement> requirements = new RequirementsService().MapCommand(command);
-            DeleteRequirement(projectId);
-            foreach (Requirement requirement in requirements)
+            int taskId = FindNextId(model.ProjectId);
+            MySqlCommand command = _connection.CreateCommand();
+            command.CommandText = GetCreateQuery();
+            PopulateCreateCommand(taskId, model, command);
+            if(model.Responsibles != null)
             {
-                CreteRequirement(projectId, requirement);
-                if (requirement.Children != null)
+                foreach(string  responsible in model.Responsibles)
                 {
-                    foreach (Requirement childRequirement in requirement.Children)
-                    {
-                        CreteRequirement(projectId, childRequirement);
-                    }
+                    InsertResponsible(model.ProjectId, taskId, responsible);
                 }
             }
-        }
-
-        private void CreteRequirement(int projectId, Requirement requirement)
-        {
-            MySqlCommand command = _connection.CreateCommand();
-            command.CommandText = GetCreateRequirementQuery();
-            PopulateCreateCommand(projectId, requirement, command);
             command.ExecuteNonQuery();
         }
 
-        private static void PopulateCreateCommand(int projectId, Requirement requirement, MySqlCommand command)
+        private static void PopulateCreateCommand(int taskId, CreateTaskCommand model, MySqlCommand command)
         {
-            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
-            command.Parameters.Add("@requirementId", MySqlDbType.Int32).Value = requirement.Id;
-            command.Parameters.Add("@name", MySqlDbType.VarChar).Value = requirement.Name;
-            command.Parameters.Add("@description", MySqlDbType.VarChar).Value = requirement.Description;
-            command.Parameters.Add("@completed", MySqlDbType.Bit).Value = requirement.Completed;
-            command.Parameters.Add("@parentId", MySqlDbType.Int32).Value = requirement.ParentId;
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = model.ProjectId;
+            command.Parameters.Add("@requirementId", MySqlDbType.Int32).Value = model.RequirementId;
+            command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = taskId;
+            command.Parameters.Add("@name", MySqlDbType.VarChar).Value = model.Name;
+            command.Parameters.Add("@description", MySqlDbType.VarChar).Value = model.Description;
+            command.Parameters.Add("@stage", MySqlDbType.Int32).Value = int.Parse(model.Stage.ToString());
         }
 
-        private string GetCreateRequirementQuery()
+        private string GetCreateQuery()
         {
             StringBuilder sql = new StringBuilder();
-            sql.AppendLine("INSERT INTO requirements (");
+            sql.AppendLine("INSERT INTO tasks (");
             sql.AppendLine("projectId");
             sql.AppendLine(",requirementId");
+            sql.AppendLine(",taskId");
             sql.AppendLine(",name");
             sql.AppendLine(",description");
-            sql.AppendLine(",completed");
-            sql.AppendLine(",parentId)");
+            sql.AppendLine(",stage)");
             sql.AppendLine("VALUES (");
             sql.AppendLine("@projectId");
             sql.AppendLine(",@requirementId");
+            sql.AppendLine(",@taskId");
             sql.AppendLine(",@name");
             sql.AppendLine(",@description");
-            sql.AppendLine(",@completed");
-            sql.AppendLine(",@parentId)");
+            sql.AppendLine(",@stage)");
             return sql.ToString();
         }
 
-        #endregion CreateRequirements
 
-        #region DeleteRequirements
+        private int FindNextId(int projectId)
+        {
+            MySqlCommand command = new MySqlCommand($"SELECT IFNULL(MAX(taskId) + 1,1) FROM tasks WHERE projectId=@projectId", _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            return int.Parse(command.ExecuteScalar().ToString());
+        }
 
-        public void DeleteRequirement(int projectId, int requirementId)
+        #endregion Create
+
+        public void InsertResponsible(int projectId, int taskId, string username)
         {
             MySqlCommand command = _connection.CreateCommand();
-            command.CommandText = "DELETE FROM requirements WHERE projectId=@projectId AND requirementId=@requirementId OR parentId=@parentId";
+            StringBuilder query = new StringBuilder();
+            query.AppendLine("INSERT INTO task_responsibles");
+            query.AppendLine("(projectId,taskId,user)");
+            query.AppendLine("VALUES");
+            query.AppendLine("(@projectId,@taskId,user)");
+            command.CommandText = query.ToString();
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
-            command.Parameters.Add("@requirementId", MySqlDbType.Int32).Value = requirementId;
-            command.Parameters.Add("@parentId", MySqlDbType.Int32).Value = requirementId;
+            command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = taskId;
+            command.Parameters.Add("@user", MySqlDbType.Int32).Value = username;
             command.ExecuteNonQuery();
         }
 
-        public void DeleteRequirement(int projectId)
+        public void DeleteResponsibles(int projectId)
         {
             MySqlCommand command = _connection.CreateCommand();
-            command.CommandText = "DELETE FROM requirements WHERE projectId=@projectId";
+            StringBuilder query = new StringBuilder();
+            query.AppendLine("DELETE FROM task_responsibles");
+            query.AppendLine("WHERE projectId=@projectId");
+            command.CommandText = query.ToString();
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
             command.ExecuteNonQuery();
         }
 
-        #endregion DeleteRequirements
-
-        #region UpdateRequirements
-
-        public void UpdateRequirements(int projectId, List<Requirement> requirements)
-        {
-            foreach (Requirement requirement in requirements)
-            {
-                DeleteRequirement(projectId, requirement.Id);
-                CreteRequirement(projectId, requirement);
-                if (requirement.Children == null) return;
-                foreach (Requirement childRequirement in requirement.Children)
-                {
-                    DeleteRequirement(projectId, childRequirement.Id);
-                    CreteRequirement(projectId, childRequirement);
-                }
-            }
-        }
-
-        #endregion UpdateRequirements
-
-        #region FindRequirements
-
-        public List<Requirement> FindRequirements(int projectId)
-        {
-            List<Requirement> everyRequirement = new List<Requirement>();
-            FindAllRequirements(projectId, everyRequirement);
-            return everyRequirement.Where(item => item.ParentId == 0).ToList();
-        }
-
-        public Requirement FindRequirement(int projectId, int requirementId)
-        {
-            List<Requirement> everyRequirement = new List<Requirement>();
-            FindAllRequirements(projectId, everyRequirement);
-            return everyRequirement.FirstOrDefault(item => item.Id == requirementId);
-        }
-
-        private void FindAllRequirements(int projectId, List<Requirement> everyRequirement)
-        {
-            MySqlCommand command = new MySqlCommand(GetFindRequirementsQuery(), _connection);
-            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
-            using (IDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    everyRequirement.Add(PopulateRequirement(reader));
-                }
-            }
-            PopulateParents(everyRequirement);
-        }
-
-        private static void PopulateParents(List<Requirement> everyRequirement)
-        {
-            List<Requirement> childs = everyRequirement.Where(item => item.ParentId > 0).ToList();
-            foreach (Requirement child in childs)
-            {
-                Requirement parent = everyRequirement.FirstOrDefault(item => item.Id == child.ParentId);
-                if (parent != null) parent.Children.Add(child);
-            }
-        }
-
-        private static Requirement PopulateRequirement(IDataReader reader)
-        {
-            return new Requirement
-            {
-                Id = int.Parse(reader["requirementId"].ToString()),
-                ParentId = int.Parse(reader["parentId"].ToString()),
-                Name = reader["name"].ToString(),
-                Description = reader["description"].ToString(),
-                Completed = Extensions.ToBool(reader["completed"].ToString()),
-                Children = new List<Requirement>(),
-            };
-        }
-
-        private string GetFindRequirementsQuery()
-        {
-            StringBuilder sql = new StringBuilder();
-            sql.AppendLine("SELECT");
-            sql.AppendLine("requirementId");
-            sql.AppendLine(",parentId");
-            sql.AppendLine(",name");
-            sql.AppendLine(",description");
-            sql.AppendLine(",completed");
-            sql.AppendLine("FROM requirements");
-            sql.AppendLine("WHERE projectId=@projectId");
-            return sql.ToString();
-        }
-
-        #endregion FindRequirements
     }
 }

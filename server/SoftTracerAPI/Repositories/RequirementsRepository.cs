@@ -20,7 +20,7 @@ namespace SoftTracerAPI.Repositories
             _connection = connection;
         }
 
-        #region CreateRequirements
+        #region Create
 
         public void Create(int projectId, List<CreateRequirementsCommand> command)
         {
@@ -77,9 +77,9 @@ namespace SoftTracerAPI.Repositories
             return sql.ToString();
         }
 
-        #endregion CreateRequirements
+        #endregion Create
 
-        #region DeleteRequirements
+        #region Delete
 
         public void Delete(int projectId, int requirementId)
         {
@@ -99,11 +99,11 @@ namespace SoftTracerAPI.Repositories
             command.ExecuteNonQuery();
         }
 
-        #endregion DeleteRequirements
+        #endregion Delete
 
-        #region UpdateRequirements
+        #region Update
 
-        public void UpdateRequirements(int projectId, List<Requirement> requirements)
+        public void Update(int projectId, List<Requirement> requirements)
         {
             foreach (Requirement requirement in requirements)
             {
@@ -118,25 +118,25 @@ namespace SoftTracerAPI.Repositories
             }
         }
 
-        #endregion UpdateRequirements
+        #endregion Update
 
-        #region FindRequirements
+        #region Find
 
         public List<Requirement> Find(int projectId)
         {
             List<Requirement> everyRequirement = new List<Requirement>();
-            FindRequirements(projectId, everyRequirement);
+            Find(projectId, everyRequirement);
             return everyRequirement.Where(item => item.ParentId == 0).ToList();
         }
 
         public Requirement Find(int projectId, int requirementId)
         {
             List<Requirement> everyRequirement = new List<Requirement>();
-            FindRequirements(projectId, everyRequirement);
+            Find(projectId, everyRequirement);
             return everyRequirement.FirstOrDefault(item => item.Id == requirementId);
         }
 
-        private void FindRequirements(int projectId, List<Requirement> everyRequirement)
+        private void Find(int projectId, List<Requirement> everyRequirement)
         {
             MySqlCommand command = new MySqlCommand(GetFindRequirementsQuery(), _connection);
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
@@ -187,6 +187,6 @@ namespace SoftTracerAPI.Repositories
             return sql.ToString();
         }
 
-        #endregion FindRequirements
+        #endregion Find
     }
 }

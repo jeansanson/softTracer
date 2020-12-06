@@ -40,7 +40,7 @@ namespace SoftTracerAPI.Controllers
             if (projectsRepository.Find(projectId) == null) { return BadRequest("Projeto não encontrado."); }
             List<Requirement> requirements = new RequirementsService().MapCommand(command);
             RequirementsRepository repository = new RequirementsRepository(Connection);
-            repository.UpdateRequirements(projectId, requirements);
+            repository.Update(projectId, requirements);
             return Ok();
         }
 
@@ -57,7 +57,7 @@ namespace SoftTracerAPI.Controllers
             if (projectsRepository.Find(projectId) == null) { return BadRequest("Projeto não encontrado."); }
             List<Requirement> requirements = new RequirementsService().MapCommand(commands);
             RequirementsRepository repository = new RequirementsRepository(Connection);
-            repository.UpdateRequirements(projectId, requirements);
+            repository.Update(projectId, requirements);
             return Ok();
         }
 
