@@ -80,10 +80,9 @@ export default {
     },
 
     loadProject(project) {
-      console.log(project);
+      this.$router.push("/projects/" + project.Id);
     },
 
-    // Route related methods
     openCreateProject() {
       this.$store.commit("showCreateProject");
     },

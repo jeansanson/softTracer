@@ -56,5 +56,8 @@ export default {
       this.$router.push("/login");
     },
   },
+  created: function() {
+    document.title = "SoftTracer";
+  },
 };
 </script>

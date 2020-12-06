@@ -31,28 +31,27 @@
           <v-list-item-title class="font-weight-bold"
             >Requisitos</v-list-item-title
           >
-          <v-list-item-title>requisitos aqui</v-list-item-title>
+          <v-btn color="primary">Adicionar requisito</v-btn>
         </v-list-item-content>
       </v-list-item>
-
-      <v-list dense>
-        <v-list-item v-for="item in items" :key="item.title">
-          <v-list-item-icon>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title>{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
     </v-navigation-drawer>
   </v-container>
 </template>
 
 <script>
 export default {
-  name: "Project Page",
+  name: "ProjectPage",
+
+  data: () => ({
+    requirements: [],
+  }),
+  created: function() {
+    if (this.$store.state.user_token == "") {
+      this.$router.push("/login");
+    } else {
+      // faz o get do projeto pelo id, se der erro ele volta pra aba de projetos
+    }
+  },
 };
 </script>
 
