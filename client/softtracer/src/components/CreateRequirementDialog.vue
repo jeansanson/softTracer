@@ -3,24 +3,24 @@
     <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="headline font-weight-bold">Criar projeto</span>
+          <span class="headline font-weight-bold">Criar requisito</span>
         </v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-text-field
               v-model="name"
               :rules="nameRules"
-              :counter="255"
-              label="Nome do projeto"
+              :counter="200"
+              label="Nome do requisito"
               required
             ></v-text-field>
 
             <v-textarea
-              v-model="resume"
-              :rules="resumeRules"
-              :counter="4090"
+              v-model="description"
+              :rules="descriptionRules"
+              :counter="4000"
               required
-              label="Resumo do projeto"
+              label="Descrição do requisito"
             >
             </v-textarea>
           </v-form>
@@ -33,7 +33,7 @@
           <v-btn
             color="blue darken-1"
             text
-            @click="createProject"
+            @click="createRequirement"
             type="submit"
           >
             Criar
@@ -48,26 +48,30 @@
 const axios = require("axios");
 
 export default {
-  name: "CreateProjectDialog",
+  name: "CreateRequirementDialog",
 
   data: () => ({
     dialog: false,
     valid: true,
+    projectId: "",
     name: "",
     nameRules: [
       (v) => !!v || "Nome é um campo necessário",
-      (v) => (v && v.length <= 255) || "Nome deve ter menos que 255 caracteres",
+      (v) => (v && v.length <= 200) || "Nome deve ter menos que 200 caracteres",
     ],
-    resume: "",
-    resumeRules: [
-      (v) => !!v || "Resumo é um campo necessário",
+    description: "",
+    descriptionRules: [
+      (v) => !!v || "Descrição é um campo necessário",
       (v) =>
-        (v && v.length <= 4090) || "Resumo deve ter menos que 4090 caracteres",
+        (v && v.length <= 4000) ||
+        "Descrição deve ter menos que 4000 caracteres",
     ],
   }),
   created() {
-    this.$store.subscribe((mutation) => {
-      if (mutation.type === "showCreateProject") {
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === "showCreateRequirement") {
+        this.projectId = state.currentProjectId;
+        
         this.dialog = true;
       }
     });
@@ -79,29 +83,37 @@ export default {
       this.resetValidation();
     },
 
-    createProject() {
+    createRequirement() {
       let self = this;
-      const URL = self.$store.state.apiURL + "/projects";
+      const URL =
+        self.$store.state.apiURL +
+        "/projects/" +
+        self.projectId +
+        "/requirements";
 
-      const data = {
-        name: this.name,
-        resume: this.resume,
-      };
+      const data = [
+        {
+          Id: 10,
+          Name: self.name,
+          Description: self.description,
+        },
+      ];
 
       const options = {
         headers: {
+          "Content-Type": "application/json",
           Authorization: self.$store.state.user_token,
         },
       };
 
       axios
-        .post(URL, data, options)
+        .put(URL, data, options)
         .then(function() {
           self.$snackbar.showMessage({
-            content: "Projeto criado com sucesso!",
+            content: "Requisito adicionado com sucesso!",
             color: "success",
           });
-          self.$store.commit("refreshProjects");
+          self.$store.commit("refreshRequirements");
           self.close();
         })
         .catch(function(error) {
