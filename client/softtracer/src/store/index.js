@@ -12,6 +12,9 @@ export default new Vuex.Store({
     user_token: "",
     user_id: "",
     apiURL: "",
+    currentProjectId: "",
+    requirements: "",
+    editRequirement: false
   },
   mutations: {
     // Show snackbar
@@ -22,7 +25,14 @@ export default new Vuex.Store({
 
     showCreateProject() {},
 
+    showCreateRequirement(state, payload) {
+      state.currentProjectId = payload.projectId;
+      state.requirements = payload.requirements;
+      state.editRequirement = payload.editRequirement;
+    },
+
     refreshProjects() {},
+    refreshRequirements() {},
 
     // Login credentials
     storeLogin(state, payload) {
