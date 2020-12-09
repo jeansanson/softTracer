@@ -66,9 +66,12 @@ namespace SoftTracerAPI.Repositories
         public Project Find(int id)
         {
             Project result = null;
-            MySqlCommand command = new MySqlCommand(GetFindProjectByIdQuery(), _connection);
+            StringBuilder query = new StringBuilder(GetFindProjectsQuery());
+            query.AppendLine("WHERE PRO.projectId=@projectId");
+            query.AppendLine("AND US.username=@username");
+            MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = id;
-
+            command.Parameters.Add("@username", MySqlDbType.VarChar).Value = _username.Identity.Name;
             using (IDataReader reader = command.ExecuteReader())
             {
                 if (reader.Read())
@@ -83,22 +86,10 @@ namespace SoftTracerAPI.Repositories
         public Project Find(Guid token)
         {
             int id = FindId(token);
-            Project result = null;
-            MySqlCommand command = new MySqlCommand(GetFindProjectByIdQuery(), _connection);
-            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = id;
-
-            using (IDataReader reader = command.ExecuteReader())
-            {
-                if (reader.Read())
-                {
-                    result = PopulateProject(reader);
-                }
-            }
-
-            return result;
+            return Find(id);
         }
 
-        static private string GetFindProjectByIdQuery()
+        static private string GetFindProjectsQuery()
         {
             StringBuilder sql = new StringBuilder();
             sql.AppendLine("SELECT PRO.projectId");
@@ -106,7 +97,7 @@ namespace SoftTracerAPI.Repositories
             sql.AppendLine(",PRO.openingDate");
             sql.AppendLine(",PRO.token");
             sql.AppendLine(",PRO.resume FROM projects PRO");
-            sql.AppendLine("WHERE PRO.projectId=@projectId");
+            sql.AppendLine("JOIN projects_users US ON PRO.projectId=US.projectId");
             return sql.ToString();
         }
 
@@ -125,7 +116,9 @@ namespace SoftTracerAPI.Repositories
         public List<Project> Find()
         {
             List<Project> result = new List<Project>();
-            MySqlCommand command = new MySqlCommand(GetFindProjectsQuery(), _connection);
+            StringBuilder query = new StringBuilder(GetFindProjectsQuery());
+            query.AppendLine("WHERE US.username=@username");
+            MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
             command.Parameters.Add("@username", MySqlDbType.VarChar).Value = _username.Identity.Name;
 
             using (IDataReader reader = command.ExecuteReader())
@@ -137,19 +130,6 @@ namespace SoftTracerAPI.Repositories
             }
 
             return result;
-        }
-
-        static private string GetFindProjectsQuery()
-        {
-            StringBuilder sql = new StringBuilder();
-            sql.AppendLine("SELECT PRO.projectId");
-            sql.AppendLine(",PRO.name");
-            sql.AppendLine(",PRO.openingDate");
-            sql.AppendLine(",PRO.token");
-            sql.AppendLine(",PRO.resume FROM");
-            sql.AppendLine("projects PRO JOIN projects_users PU ON PRO.projectId=PU.projectId");
-            sql.AppendLine("WHERE PU.username=@username");
-            return sql.ToString();
         }
 
         #endregion Find

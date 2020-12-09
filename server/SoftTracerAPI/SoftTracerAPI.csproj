@@ -183,6 +183,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Commands\Projects\InsertUserCommandValidator.cs" />
+    <Compile Include="Commands\Projects\InsertUserCommand.cs" />
     <Compile Include="Commands\Projects\CreateProjectCommand.cs" />
     <Compile Include="Commands\Projects\CreateProjectCommandValidator.cs" />
     <Compile Include="Commands\Requirements\UpdateRequirementsCommand.cs" />
@@ -214,6 +216,7 @@
     <Compile Include="Models\Projects\ProjectHeader.cs" />
     <Compile Include="Models\Requirements\Requirement.cs" />
     <Compile Include="Models\Projects\UserRole.cs" />
+    <Compile Include="Models\Tasks\Task.cs" />
     <Compile Include="Models\Tasks\TaskStage.cs" />
     <Compile Include="Models\Users\Authentication.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

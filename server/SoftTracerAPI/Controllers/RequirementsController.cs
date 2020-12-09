@@ -47,7 +47,7 @@ namespace SoftTracerAPI.Controllers
         [TokenAuthenticator]
         [HttpPut]
         [Route("~/api/projects/{projectId}/requirements/{requirementId}")]
-        public IHttpActionResult CreateUpdateRequirements([FromUri] int projectId, [FromBody] UpdateRequirementsCommand command)
+        public IHttpActionResult CreateUpdateRequirement([FromUri] int projectId, [FromBody] UpdateRequirementsCommand command)
         {
             if (command == null || projectId <= 0) { return BadRequest(DefaultMessages.InvalidBody); }
             List<UpdateRequirementsCommand> commands = new List<UpdateRequirementsCommand>() { command };
@@ -60,19 +60,38 @@ namespace SoftTracerAPI.Controllers
             repository.Update(projectId, requirements);
             return Ok();
         }
-
-
+        
 
         [TokenAuthenticator]
         [HttpGet]
         [Route("~/api/projects/{projectId}/requirements")]
-        public IHttpActionResult CreateUpdateRequirements([FromUri] int projectId)
+        public IHttpActionResult FindRequirements([FromUri] int projectId)
         {
             if (projectId <= 0) { return BadRequest(DefaultMessages.InvalidBody); }
             ProjectsRepository projectsRepository = new ProjectsRepository(Connection, HttpContext.Current.User);
             if (projectsRepository.Find(projectId) == null) { return BadRequest("Projeto não encontrado."); }
             RequirementsRepository repository = new RequirementsRepository(Connection);
             return Ok(repository.Find(projectId));
+        }
+
+        [TokenAuthenticator]
+        [HttpDelete]
+        [Route("~/api/projects/{projectId}/requirements/{requirementId}")]
+        public IHttpActionResult DeleteRequirement([FromUri] int projectId, [FromUri] int requirementId)
+        {
+            RequirementsRepository repository = new RequirementsRepository(Connection);
+            repository.Delete(projectId, requirementId);
+            return Ok();
+        }
+
+        [TokenAuthenticator]
+        [HttpDelete]
+        [Route("~/api/projects/{projectId}/requirements")]
+        public IHttpActionResult DeleteRequirements([FromUri] int projectId)
+        {
+            RequirementsRepository repository = new RequirementsRepository(Connection);
+            repository.Delete(projectId);
+            return Ok();
         }
 
     }

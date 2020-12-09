@@ -23,7 +23,6 @@ CREATE TABLE `projects` (
   PRIMARY KEY (`projectId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-
 CREATE TABLE `requirements` (
   `projectId` INT NOT NULL,
   `requirementId` INT NOT NULL,
@@ -32,3 +31,20 @@ CREATE TABLE `requirements` (
   `completed` BIT(1) NULL,
   `parentId` INT NULL,
   PRIMARY KEY (`projectId`, `requirementId`));
+  
+  CREATE TABLE `tasks` (
+  `taskId` INT NOT NULL,
+  `projectId` INT NOT NULL,
+  `requirementId` INT NULL,
+  `name` VARCHAR(255) NULL,
+  `description` VARCHAR(4092) NULL,
+  `stage` INT NULL,
+  PRIMARY KEY (`taskId`, `projectId`));
+  
+  CREATE TABLE `task_responsibles` (
+  `projectId` INT NOT NULL,
+  `taskId` INT NOT NULL,
+  `user` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`projectId`, `taskId`, `user`));
+
+

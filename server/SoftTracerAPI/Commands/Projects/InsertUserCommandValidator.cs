@@ -7,7 +7,7 @@ namespace SoftTracerAPI.Commands.Projects
     {
         public ValidationError Validate(InsertUserCommand command)
         {
-            if (command.ProjectToken == Guid.Empty  )) { _manager.AddError("Token inválido"); }
+            if (command.ProjectToken == Guid.Empty) { _manager.AddError("Token inválido"); }
             if (string.IsNullOrWhiteSpace(command.UserId)) { _manager.AddError("Usuário inválido"); }
             return _manager.GetError();
         }

@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Text;
 using SofTracerAPI.Commands.Tasks;
+using System.Threading.Tasks;
 
 namespace SoftTracerAPI.Repositories
 {
@@ -30,7 +31,7 @@ namespace SoftTracerAPI.Repositories
                 }
             }
             command.ExecuteNonQuery();
-        }
+        } 
 
         private static void PopulateCreateCommand(int taskId, CreateTaskCommand model, MySqlCommand command)
         {
@@ -87,16 +88,19 @@ namespace SoftTracerAPI.Repositories
             command.ExecuteNonQuery();
         }
 
-        public void DeleteResponsibles(int projectId)
+        public void DeleteResponsibles(int projectId, int taskId)
         {
             MySqlCommand command = _connection.CreateCommand();
             StringBuilder query = new StringBuilder();
             query.AppendLine("DELETE FROM task_responsibles");
             query.AppendLine("WHERE projectId=@projectId");
+            query.AppendLine("AND taskId=@taskId");
             command.CommandText = query.ToString();
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = taskId;
             command.ExecuteNonQuery();
         }
+
 
     }
 }

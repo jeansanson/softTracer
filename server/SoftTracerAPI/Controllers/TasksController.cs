@@ -31,9 +31,9 @@ namespace SoftTracerAPI.Controllers
                 Requirement requirement = requirementsRepository.Find(command.ProjectId, command.RequirementId);
                 if(requirement == null ) { return BadRequest("Requisito não encontrado neste projeto."); }
             }
-      
 
-
+            TaskRepository taskRepository = new TaskRepository(Connection);
+            taskRepository.Create(command);
             return Ok();
         }
 
