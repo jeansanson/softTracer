@@ -31,6 +31,10 @@ namespace SofTracerAPI.Services
                     Description = item.Description,
                     Children = new List<Requirement>()
                 };
+                if (item.ParentId > 0)
+                {
+                    requirement.ParentId = item.ParentId;
+                }
                 result.Add(requirement);
                 if (item.Children != null)
                 {
@@ -53,7 +57,10 @@ namespace SofTracerAPI.Services
                 Description = command.Description,
                 Children = new List<Requirement>()
             };
-
+            if (command.ParentId > 0)
+            {
+                requirement.ParentId = command.ParentId;
+            }
             if (command.Children != null)
             {
                 foreach (CreateRequirementsCommand child in command.Children)
@@ -124,7 +131,10 @@ namespace SofTracerAPI.Services
                     PopulateIdentifierDictionary(requirement.Children,  ref id);
                     foreach(Requirement children in requirement.Children)
                     {
+                        if(children.ParentId == 0)
+                        {
                         children.ParentId = requirement.Id;
+                        }
                     }
                 }
             }

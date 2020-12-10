@@ -8,6 +8,8 @@ namespace SofTracerAPI.Commands.Projects.Requirements
 
         public string Description { get; set; }
 
+        public int ParentId { get; set; }
+
         public List<CreateRequirementsCommand> Children { get; set; }
     }
 }
