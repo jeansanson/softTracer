@@ -6,11 +6,11 @@ namespace SofTracerAPI.Services
 {
     public class RequirementsService
     {
-        public List<Requirement> MapCommand(List<CreateRequirementsCommand> command)
+
+        public List<Requirement> MapCommand(List<CreateRequirementsCommand> command, int nextId)
         {
             List<Requirement> requirement = CreateCommandToRequirement(command);
-            List<Requirement> everyRequirement = new List<Requirement>();
-            PopulateIdentifierDictionary(requirement, everyRequirement);
+            PopulateIdentifierDictionary(requirement,  ref nextId);
             return requirement;
         }
 
@@ -113,35 +113,22 @@ namespace SofTracerAPI.Services
             return requirement;
         }
 
-        private static void PopulateIdentifierDictionary(List<Requirement> requirements, List<Requirement> list)
+        private void PopulateIdentifierDictionary(List<Requirement> requirements,  ref int id)
         {
             foreach (Requirement requirement in requirements)
             {
-                requirement.Id = list.Count + 1;
-                list.Add(requirement);
+                requirement.Id = id;
+                id++;
                 if (requirement.Children != null)
                 {
-                    foreach (Requirement child in requirement.Children)
+                    PopulateIdentifierDictionary(requirement.Children,  ref id);
+                    foreach(Requirement children in requirement.Children)
                     {
-                        child.ParentId = requirement.Id;
-                        PopulateIdentifierDictionary(child, list);
+                        children.ParentId = requirement.Id;
                     }
                 }
             }
         }
 
-        private static void PopulateIdentifierDictionary(Requirement requirement, List<Requirement> list)
-        {
-            requirement.Id = list.Count + 1;
-            list.Add(requirement);
-            if (requirement.Children != null)
-            {
-                foreach (Requirement child in requirement.Children)
-                {
-                    child.ParentId = requirement.Id;
-                    PopulateIdentifierDictionary(child, list);
-                }
-            }
-        }
     }
 }

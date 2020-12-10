@@ -24,8 +24,7 @@ namespace SoftTracerAPI.Repositories
 
         public void Create(int projectId, List<CreateRequirementsCommand> command)
         {
-            List<Requirement> requirements = new RequirementsService().MapCommand(command);
-            Delete(projectId);
+            List<Requirement> requirements = new RequirementsService().MapCommand(command, FindNextId(projectId));
             foreach (Requirement requirement in requirements)
             {
                 Create(projectId, requirement);
@@ -188,5 +187,12 @@ namespace SoftTracerAPI.Repositories
         }
 
         #endregion Find
+
+         private int FindNextId(int projectId)
+        {
+            MySqlCommand command = new MySqlCommand($"SELECT IFNULL(MAX(requirementId) + 1,1) FROM requirements WHERE projectId=@projectId", _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            return int.Parse(command.ExecuteScalar().ToString());
+        }
     }
 }
