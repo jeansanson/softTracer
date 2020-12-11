@@ -144,12 +144,30 @@ namespace SoftTracerAPI.Repositories
             command.ExecuteNonQuery();
         }
 
+        public void DeleteUser(int projectId, string username)
+        {
+            UserRole role = findUserRole(projectId, username);
+            if (role == UserRole.Guest && username != _username.Identity.Name) { return; }
+            MySqlCommand command = new MySqlCommand("DELETE FROM projects_users WHERE username=@username AND projectId=@projectId", _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.Parameters.Add("@username", MySqlDbType.VarChar).Value = username;
+            command.ExecuteNonQuery();
+        }
+
         public void AddUser(Guid projectToken, string username, UserRole role)
         {
             MySqlCommand command = _connection.CreateCommand();
             command.CommandText = GetAddUserCommandText();
             PopulateAddUserCommand(projectToken, role, username, command);
             command.ExecuteNonQuery();
+        }
+
+        private UserRole findUserRole(int projectId, string username)
+        {
+            MySqlCommand command = new MySqlCommand($"SELECT role FROM projects_users WHERE projectId=@projectId AND username=@username", _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.Parameters.Add("@username", MySqlDbType.VarChar).Value = username;
+            return (UserRole)int.Parse(command.ExecuteScalar().ToString());
         }
 
         private void PopulateAddUserCommand(Guid projectToken, UserRole role, string username, MySqlCommand command)

@@ -149,12 +149,12 @@ namespace SoftTracerAPI.Repositories
             {
                 while (reader.Read())
                 {
-                    result.Add(populateTask(reader));
+                    result.Add(PopulateTask(reader));
                 }
             }
             foreach(Task task in result)
             {
-                populateResponsibles(task);
+                PopulateResponsibles(task);
             }
             return result;
         }
@@ -172,14 +172,14 @@ namespace SoftTracerAPI.Repositories
             {
                 if (reader.Read())
                 {
-                    result = populateTask(reader);
+                    result = PopulateTask(reader);
                 }
             }
-            populateResponsibles(result);
+            PopulateResponsibles(result);
             return result;
         }
 
-        private void populateResponsibles(Task task)
+        private void PopulateResponsibles(Task task)
         {
             if (task == null) return;
             MySqlCommand command = new MySqlCommand("SELECT user FROM task_responsibles WHERE @projectId=@projectId AND taskId=@taskId", _connection);
@@ -194,7 +194,7 @@ namespace SoftTracerAPI.Repositories
             }
         }
 
-        private static Task populateTask(IDataReader reader)
+        private static Task PopulateTask(IDataReader reader)
         {
             return new Task
             {

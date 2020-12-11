@@ -1,8 +1,10 @@
 ﻿using ExtensionMethods;
 using MySql.Data.MySqlClient;
+using SofTracerAPI.Models.Projects;
 using SoftTracerAPI.Commands.Users;
 using SoftTracerAPI.Models;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text;
 
@@ -111,6 +113,70 @@ namespace SoftTracerAPI.Repositories
         }
 
         #endregion CreateUser
+
+        public List<ProjectUser> FindUsers(int projectId)
+        {
+            List<ProjectUser> result = new List<ProjectUser>();
+            StringBuilder query = new StringBuilder(GetFindUsersQuery());
+            query.AppendLine("WHERE PO.projectId=@projectId");
+            MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    result.Add(PopulateProjectUser(reader));
+                }
+            }
+            return result;
+        }
+
+        public ProjectUser FindUser(int projectId, string username)
+        {
+            ProjectUser result = null;
+            StringBuilder query = new StringBuilder(GetFindUsersQuery());
+            query.AppendLine("WHERE PO.projectId=@projectId");
+            query.AppendLine("AND PO.username=@username");
+            MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.Parameters.Add("@username", MySqlDbType.VarChar).Value = username;
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    result = PopulateProjectUser(reader);
+                }
+            }
+            return result;
+        }
+
+
+        private static ProjectUser PopulateProjectUser(IDataReader reader)
+        {
+            return new ProjectUser
+            {
+                UserId = reader["username"].ToString(),
+                DisplayName = reader["displayName"].ToString(),
+                Email = reader["email"].ToString(),
+                Role = (UserRole)int.Parse(reader["role"].ToString())
+            };
+        }
+
+
+        private string GetFindUsersQuery()
+        {
+            StringBuilder query = new StringBuilder();
+            query.AppendLine("SELECT");
+            query.AppendLine("US.username");
+            query.AppendLine(",US.displayName");
+            query.AppendLine(",US.email");
+            query.AppendLine(",PO.role");
+            query.AppendLine("FROM users US");
+            query.AppendLine("JOIN projects_users PO ON US.username=PO.username");
+            return query.ToString();
+        }
+
+
 
     }
 }

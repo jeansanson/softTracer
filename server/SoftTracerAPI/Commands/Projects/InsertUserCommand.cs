@@ -7,7 +7,5 @@ namespace SoftTracerAPI.Commands.Projects
 
         public Guid ProjectToken { get; set; }
 
-        public string UserId { get; set; }
-
     }
 }
