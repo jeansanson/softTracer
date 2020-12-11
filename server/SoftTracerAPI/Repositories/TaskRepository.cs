@@ -1,7 +1,9 @@
 ﻿using MySql.Data.MySqlClient;
 using System.Text;
 using SofTracerAPI.Commands.Tasks;
-using System.Threading.Tasks;
+using System.Data;
+using Task = SofTracerAPI.Models.Tasks.Task;
+using System.Collections.Generic;
 
 namespace SoftTracerAPI.Repositories
 {
@@ -9,15 +11,46 @@ namespace SoftTracerAPI.Repositories
 
     {
         private readonly MySqlConnection _connection;
+        private readonly UsersRepository _usersRepository;
 
         public TaskRepository(MySqlConnection connection)
         {
+            _usersRepository = new UsersRepository(connection);
             _connection = connection;
         }
 
+        #region Update
+        public void Update(UpdateTaskCommand model)
+        {
+            Delete(model.ProjectId, model.TaskId);
+            MySqlCommand command = _connection.CreateCommand();
+            command.CommandText = GetCreateQuery();
+            PopulateUpdateCommand(model, command);
+            if (model.Responsibles != null)
+            {
+                foreach (string responsible in model.Responsibles)
+                {
+                    InsertResponsible(model.ProjectId, model.TaskId, responsible);
+                }
+            }
+            command.ExecuteNonQuery();
+        }
+
+        private static void PopulateUpdateCommand(UpdateTaskCommand model, MySqlCommand command)
+        {
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = model.ProjectId;
+            command.Parameters.Add("@requirementId", MySqlDbType.Int32).Value = model.RequirementId;
+            command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = model.TaskId;
+            command.Parameters.Add("@name", MySqlDbType.VarChar).Value = model.Name;
+            command.Parameters.Add("@description", MySqlDbType.VarChar).Value = model.Description;
+            command.Parameters.Add("@stage", MySqlDbType.Int32).Value = model.Stage;
+        }
+
+        #endregion
+
         #region Create
 
-        public void Create(CreateTaskCommand model)
+        public Task Create(CreateTaskCommand model)
         {
             int taskId = FindNextId(model.ProjectId);
             MySqlCommand command = _connection.CreateCommand();
@@ -31,6 +64,7 @@ namespace SoftTracerAPI.Repositories
                 }
             }
             command.ExecuteNonQuery();
+            return Find(model.ProjectId, taskId);
         } 
 
         private static void PopulateCreateCommand(int taskId, CreateTaskCommand model, MySqlCommand command)
@@ -40,7 +74,7 @@ namespace SoftTracerAPI.Repositories
             command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = taskId;
             command.Parameters.Add("@name", MySqlDbType.VarChar).Value = model.Name;
             command.Parameters.Add("@description", MySqlDbType.VarChar).Value = model.Description;
-            command.Parameters.Add("@stage", MySqlDbType.Int32).Value = int.Parse(model.Stage.ToString());
+            command.Parameters.Add("@stage", MySqlDbType.Int32).Value = model.Stage;
         }
 
         private string GetCreateQuery()
@@ -73,18 +107,135 @@ namespace SoftTracerAPI.Repositories
 
         #endregion Create
 
+        #region Delete
+
+        public void Delete(int projectId, int taskId)
+        {
+            MySqlCommand command = _connection.CreateCommand();
+            StringBuilder query = new StringBuilder();
+            query.AppendLine("DELETE FROM tasks");
+            query.AppendLine("WHERE projectId=@projectId");
+            query.AppendLine("AND taskId=@taskId");
+            command.CommandText = query.ToString();
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = taskId;
+            command.ExecuteNonQuery();
+            DeleteResponsibles(projectId, taskId);
+        }
+
+        public void Delete(int projectId)
+        {
+            MySqlCommand command = _connection.CreateCommand();
+            StringBuilder query = new StringBuilder();
+            query.AppendLine("DELETE FROM tasks");
+            query.AppendLine("WHERE projectId=@projectId");
+            command.CommandText = query.ToString();
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.ExecuteNonQuery();
+            DeleteResponsibles(projectId);
+        }
+
+        #endregion
+
+
+        public List<Task> Find(int projectId)
+        {
+            List<Task> result = new List<Task>();
+            StringBuilder query = new StringBuilder(GetFindTaskHeaderQuery());
+            query.AppendLine("WHERE projectId=@projectId");
+            MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    result.Add(populateTask(reader));
+                }
+            }
+            foreach(Task task in result)
+            {
+                populateResponsibles(task);
+            }
+            return result;
+        }
+
+        public Task Find(int projectId, int taskId)
+        {
+            Task result = null;
+            StringBuilder query = new StringBuilder(GetFindTaskHeaderQuery());
+            query.AppendLine("WHERE projectId=@projectId");
+            query.AppendLine("AND taskId=@taskId");
+            MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = taskId;
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    result = populateTask(reader);
+                }
+            }
+            populateResponsibles(result);
+            return result;
+        }
+
+        private void populateResponsibles(Task task)
+        {
+            if (task == null) return;
+            MySqlCommand command = new MySqlCommand("SELECT user FROM task_responsibles WHERE @projectId=@projectId AND taskId=@taskId", _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = task.ProjectId;
+            command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = task.Id;
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    task.Responsibles.Add(reader["user"].ToString());
+                }
+            }
+        }
+
+        private static Task populateTask(IDataReader reader)
+        {
+            return new Task
+            {
+                Id = int.Parse(reader["taskId"].ToString()),
+                ProjectId = int.Parse(reader["projectId"].ToString()),
+                Name = reader["name"].ToString(),
+                Description = reader["description"].ToString(),
+                RequirementId = int.Parse(reader["requirementId"].ToString()),
+                Stage = (SofTracerAPI.Models.Tasks.TaskStage)int.Parse(reader["stage"].ToString()),
+                Responsibles = new List<string>(),
+            };
+        }
+
+
+        private string GetFindTaskHeaderQuery()
+        {
+            StringBuilder query = new StringBuilder();
+            query.AppendLine("SELECT");
+            query.AppendLine("taskId");
+            query.AppendLine(",projectId");
+            query.AppendLine(",requirementId");
+            query.AppendLine(",name");
+            query.AppendLine(",description");
+            query.AppendLine(",stage");
+            query.AppendLine("FROM tasks");
+            return query.ToString();
+        }
+
         public void InsertResponsible(int projectId, int taskId, string username)
         {
+            if (!_usersRepository.UserExists(username)) { return; }
             MySqlCommand command = _connection.CreateCommand();
             StringBuilder query = new StringBuilder();
             query.AppendLine("INSERT INTO task_responsibles");
             query.AppendLine("(projectId,taskId,user)");
             query.AppendLine("VALUES");
-            query.AppendLine("(@projectId,@taskId,user)");
+            query.AppendLine("(@projectId,@taskId,@user)");
             command.CommandText = query.ToString();
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
             command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = taskId;
-            command.Parameters.Add("@user", MySqlDbType.Int32).Value = username;
+            command.Parameters.Add("@user", MySqlDbType.VarChar).Value = username;
             command.ExecuteNonQuery();
         }
 
@@ -98,6 +249,17 @@ namespace SoftTracerAPI.Repositories
             command.CommandText = query.ToString();
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
             command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = taskId;
+            command.ExecuteNonQuery();
+        }
+
+        public void DeleteResponsibles(int projectId)
+        {
+            MySqlCommand command = _connection.CreateCommand();
+            StringBuilder query = new StringBuilder();
+            query.AppendLine("DELETE FROM task_responsibles");
+            query.AppendLine("WHERE projectId=@projectId");
+            command.CommandText = query.ToString();
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
             command.ExecuteNonQuery();
         }
 

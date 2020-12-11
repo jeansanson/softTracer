@@ -5,7 +5,7 @@
         Undefined = 0,
         Backlog = 1,
         Todo = 2,
-        Doing = 4,
-        Done = 5
+        Doing = 3,
+        Done = 4
     }
 }

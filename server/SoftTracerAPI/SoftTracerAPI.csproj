@@ -191,6 +191,8 @@
     <Compile Include="Commands\Requirements\UpdateRequirementsCommandValidator.cs" />
     <Compile Include="Commands\Requirements\CreateRequirementsCommandValidator.cs" />
     <Compile Include="Commands\Requirements\CreateRequirementsCommand.cs" />
+    <Compile Include="Commands\Tasks\UpdateTaskCommandValidator.cs" />
+    <Compile Include="Commands\Tasks\UpdateTaskCommand.cs" />
     <Compile Include="Commands\Tasks\CreateTaskCommandValidator.cs" />
     <Compile Include="Commands\Tasks\CreateTaskCommand.cs" />
     <Compile Include="Commands\Users\CreateUserCommandValidator.cs" />

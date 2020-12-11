@@ -15,7 +15,7 @@ namespace SoftTracerAPI.Controllers
     {
         [TokenAuthenticator]
         [HttpPost]
-        [Route("~/api/projects/{projectId}/requirements/")]
+        [Route("~/api/projects/{projectId:int}/requirements/")]
         public IHttpActionResult CreateRequirements([FromUri] int projectId, [FromBody] List<CreateRequirementsCommand> command)
         {
             if (command == null || projectId <= 0) { return BadRequest(DefaultMessages.InvalidBody); }
@@ -30,7 +30,7 @@ namespace SoftTracerAPI.Controllers
 
         [TokenAuthenticator]
         [HttpPut]
-        [Route("~/api/projects/{projectId}/requirements")]
+        [Route("~/api/projects/{projectId:int}/requirements")]
         public IHttpActionResult CreateUpdateRequirements([FromUri] int projectId, [FromBody] List<UpdateRequirementsCommand> command)
         {
             if (command == null || projectId <= 0) { return BadRequest(DefaultMessages.InvalidBody); }
@@ -46,7 +46,7 @@ namespace SoftTracerAPI.Controllers
 
         [TokenAuthenticator]
         [HttpPut]
-        [Route("~/api/projects/{projectId}/requirements/{requirementId}")]
+        [Route("~/api/projects/{projectId:int}/requirements/{requirementId}")]
         public IHttpActionResult CreateUpdateRequirement([FromUri] int projectId, [FromBody] UpdateRequirementsCommand command)
         {
             if (command == null || projectId <= 0) { return BadRequest(DefaultMessages.InvalidBody); }
@@ -64,7 +64,7 @@ namespace SoftTracerAPI.Controllers
 
         [TokenAuthenticator]
         [HttpGet]
-        [Route("~/api/projects/{projectId}/requirements")]
+        [Route("~/api/projects/{projectId:int}/requirements")]
         public IHttpActionResult FindRequirements([FromUri] int projectId)
         {
             if (projectId <= 0) { return BadRequest(DefaultMessages.InvalidBody); }
@@ -76,7 +76,7 @@ namespace SoftTracerAPI.Controllers
 
         [TokenAuthenticator]
         [HttpDelete]
-        [Route("~/api/projects/{projectId}/requirements/{requirementId}")]
+        [Route("~/api/projects/{projectId:int}/requirements/{requirementId}")]
         public IHttpActionResult DeleteRequirement([FromUri] int projectId, [FromUri] int requirementId)
         {
             RequirementsRepository repository = new RequirementsRepository(Connection);
@@ -86,7 +86,7 @@ namespace SoftTracerAPI.Controllers
 
         [TokenAuthenticator]
         [HttpDelete]
-        [Route("~/api/projects/{projectId}/requirements")]
+        [Route("~/api/projects/{projectId:int}/requirements")]
         public IHttpActionResult DeleteRequirements([FromUri] int projectId)
         {
             RequirementsRepository repository = new RequirementsRepository(Connection);
