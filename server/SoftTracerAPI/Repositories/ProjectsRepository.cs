@@ -146,7 +146,7 @@ namespace SoftTracerAPI.Repositories
 
         public void DeleteUser(int projectId, string username)
         {
-            UserRole role = findUserRole(projectId, username);
+            UserRole role = FindUserRole(projectId, username);
             if (role == UserRole.Guest && username != _username.Identity.Name) { return; }
             MySqlCommand command = new MySqlCommand("DELETE FROM projects_users WHERE username=@username AND projectId=@projectId", _connection);
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
@@ -162,7 +162,7 @@ namespace SoftTracerAPI.Repositories
             command.ExecuteNonQuery();
         }
 
-        private UserRole findUserRole(int projectId, string username)
+        private UserRole FindUserRole(int projectId, string username)
         {
             MySqlCommand command = new MySqlCommand($"SELECT role FROM projects_users WHERE projectId=@projectId AND username=@username", _connection);
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;

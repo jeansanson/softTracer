@@ -57,9 +57,8 @@ namespace SoftTracerAPI.Controllers
             }
 
             ProjectsRepository repository = new ProjectsRepository(Connection, User);
-            if (repository.Find(command.ProjectToken) == null) { return BadRequest("Projeto não encontrado"); }
             repository.AddUser(command.ProjectToken, UserRole.Guest);
-            return Ok();
+            return Ok(repository.Find(command.ProjectToken));
         }
 
 
