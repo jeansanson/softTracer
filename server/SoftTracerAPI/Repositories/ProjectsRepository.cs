@@ -30,7 +30,7 @@ namespace SoftTracerAPI.Repositories
             command.CommandText = GetCreateCommandText();
             PopulateCreateCommand(model, command, projectId);
             command.ExecuteNonQuery();
-            Project project = Find(projectId);
+            Project project = FindWithoutUserCheck(projectId);
             AddUser(project.Token, UserRole.Administrator);
             return project;
         }
@@ -67,11 +67,29 @@ namespace SoftTracerAPI.Repositories
         {
             Project result = null;
             StringBuilder query = new StringBuilder(GetFindProjectsQuery());
-            query.AppendLine("WHERE PRO.projectId=@projectId");
+            query.AppendLine(" WHERE PRO.projectId=@projectId");
             query.AppendLine("AND US.username=@username");
             MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = id;
             command.Parameters.Add("@username", MySqlDbType.VarChar).Value = _username.Identity.Name;
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    result = PopulateProject(reader);
+                }
+            }
+
+            return result;
+        }
+
+        private Project FindWithoutUserCheck(int id)
+        {
+            Project result = null;
+            StringBuilder query = new StringBuilder(GetFindProjectsWithoutUserCheckQuery());
+            query.AppendLine(" WHERE PRO.projectId=@projectId");
+            MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = id;
             using (IDataReader reader = command.ExecuteReader())
             {
                 if (reader.Read())
@@ -100,6 +118,19 @@ namespace SoftTracerAPI.Repositories
             sql.AppendLine("JOIN projects_users US ON PRO.projectId=US.projectId");
             return sql.ToString();
         }
+
+
+        static private string GetFindProjectsWithoutUserCheckQuery()
+        {
+            StringBuilder sql = new StringBuilder();
+            sql.AppendLine("SELECT PRO.projectId");
+            sql.AppendLine(",PRO.name");
+            sql.AppendLine(",PRO.openingDate");
+            sql.AppendLine(",PRO.token");
+            sql.AppendLine(",PRO.resume FROM projects PRO");
+            return sql.ToString();
+        }
+
 
         private static Project PopulateProject(IDataReader reader)
         {
