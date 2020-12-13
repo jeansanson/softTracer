@@ -3,36 +3,26 @@
     <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="headline font-weight-bold">Criar projeto</span>
+          <span class="headline font-weight-bold">Entrar em um projeto</span>
         </v-card-title>
         <v-card-text>
           <v-form ref="form" v-model="valid" lazy-validation>
             <v-text-field
-              v-model="name"
-              :rules="nameRules"
-              :counter="255"
-              label="Nome do projeto"
+              v-model="token"
+              :rules="tokenRules"
+              label="Token"
               required
-            ></v-text-field>
-
-            <v-textarea
-              v-model="resume"
-              :rules="resumeRules"
-              :counter="4090"
-              required
-              label="Resumo do projeto"
-            >
-            </v-textarea>
-          </v-form>
+            ></v-text-field
+          ></v-form>
         </v-card-text>
-        <v-card-actions>
-          <v-btn
+        <v-card-actions
+          ><v-btn
             color="blue darken-1"
             text
-            @click="createProject"
             type="submit"
+            @click="enterProject()"
           >
-            Criar
+            Entrar
           </v-btn>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="close">
@@ -53,21 +43,12 @@ export default {
   data: () => ({
     dialog: false,
     valid: true,
-    name: "",
-    nameRules: [
-      (v) => !!v || "Nome é um campo necessário",
-      (v) => (v && v.length <= 255) || "Nome deve ter menos que 255 caracteres",
-    ],
-    resume: "",
-    resumeRules: [
-      (v) => !!v || "Resumo é um campo necessário",
-      (v) =>
-        (v && v.length <= 4090) || "Resumo deve ter menos que 4090 caracteres",
-    ],
+    token: "",
+    tokenRules: [(v) => !!v || "Token é um campo necessário"],
   }),
   created() {
     this.$store.subscribe((mutation) => {
-      if (mutation.type === "showCreateProject") {
+      if (mutation.type === "showEnterProject") {
         this.dialog = true;
       }
     });
@@ -79,13 +60,12 @@ export default {
       this.resetValidation();
     },
 
-    createProject() {
+    enterProject() {
       let self = this;
-      const URL = self.$store.state.apiURL + "/projects";
+      const URL = self.$store.state.apiURL + "/projects/users";
 
       const data = {
-        Name: this.name,
-        Resume: this.resume,
+        ProjectToken: this.token
       };
 
       const options = {
@@ -98,7 +78,7 @@ export default {
         .post(URL, data, options)
         .then(function() {
           self.$snackbar.showMessage({
-            content: "Projeto criado com sucesso!",
+            content: "Projeto adicionado com sucesso!",
             color: "success",
           });
           self.$store.commit("refreshProjects");

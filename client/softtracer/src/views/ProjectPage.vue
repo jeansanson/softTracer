@@ -7,16 +7,15 @@
       </v-row>
     </div>
     <v-navigation-drawer absolute permanent right width="350">
-      <template v-slot:prepend>
-        <v-list-item>
-          <v-list-item-content>
-            <v-list-item-title class="font-weight-bold"
-              >Resumo do projeto</v-list-item-title
-            >
-            <v-list-item-title>{{ resume }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </template>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title class="font-weight-bold"
+            >Resumo do projeto</v-list-item-title
+          >
+          <v-text class="resume">{{ resume }}</v-text>
+        </v-list-item-content>
+      </v-list-item>
+
       <v-divider></v-divider>
       <v-list-item>
         <v-list-item-content>
@@ -24,6 +23,15 @@
             >Data de criação</v-list-item-title
           >
           <v-list-item-title>{{ dateCreated }}</v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+      <v-divider></v-divider>
+      <v-list-item>
+        <v-list-item-content>
+          <v-list-item-title class="font-weight-bold"
+            >Token do projeto</v-list-item-title
+          >
+          <v-list-item-title>{{ token }}</v-list-item-title>
         </v-list-item-content>
       </v-list-item>
       <v-divider></v-divider>
@@ -96,7 +104,7 @@ export default {
         .get(URL, options)
         .then(function(response) {
           console.log(response);
-          self.dateCreated = response.data.openingDate;
+          self.dateCreated = self.convertDate(response.data.openingDate);
           self.resume = response.data.resume;
           self.name = response.data.name;
           self.token = response.data.token;
@@ -128,6 +136,11 @@ export default {
       });
     },
 
+    convertDate(string) {
+      const date = new Date(string);
+      return date.toLocaleDateString("pt-BR", { dateStyle: "long" });
+    },
+
     // Route related methods
     goToProjects() {
       this.$router.push("/projects/");
@@ -144,4 +157,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style>
+.resume {
+  word-wrap: break-word;
+}
+</style>

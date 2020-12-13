@@ -24,9 +24,7 @@
         >
       </template>
       <template v-slot:append="{ item }">
-        <v-btn small rounded class="ma-2" @click="teste(item)"
-          ><v-icon small>mdi-information</v-icon></v-btn
-        >
+        
         <v-btn small rounded color="secondary" class="ma-2" @click="openEditRequirement(item)"
           ><v-icon small>mdi-pencil-outline</v-icon></v-btn
         >

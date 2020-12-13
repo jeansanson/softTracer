@@ -24,6 +24,8 @@ export default new Vuex.Store({
     },
 
     showCreateProject() {},
+    
+    showEnterProject() {},
 
     showCreateRequirement(state, payload) {
       state.currentProjectId = payload.projectId;
@@ -37,6 +39,7 @@ export default new Vuex.Store({
     },
 
     refreshProjects() {},
+    
     refreshRequirements() {},
 
     // Login credentials

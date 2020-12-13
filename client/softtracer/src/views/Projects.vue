@@ -3,6 +3,7 @@
     <v-row>
       <h1 class="mb-5 mt-2 ml-3">Seus projetos</h1>
       <v-spacer></v-spacer>
+      <v-btn class="mt-4 mr-3" color="primary" @click="openEnterProject">Entrar em um projeto</v-btn>
       <v-btn class="mt-4 mr-3" color="primary" @click="openCreateProject"
         >Criar projeto</v-btn
       >
@@ -18,19 +19,22 @@
       </v-col>
     </v-row>
 
+    <EnterProjectDialog />
     <CreateProjectDialog />
   </v-container>
 </template>
 
 <script>
 const axios = require("axios");
-import CreateProjectDialog from "../components/CreateProjectDialog";
+import CreateProjectDialog from "../components/EnterProjectDialog";
+import EnterProjectDialog from "../components/CreateProjectDialog";
 
 export default {
   name: "Projects",
 
   components: {
     CreateProjectDialog,
+    EnterProjectDialog
   },
   data: () => ({ projects: [] }),
   created: function() {
@@ -85,6 +89,10 @@ export default {
 
     openCreateProject() {
       this.$store.commit("showCreateProject");
+    },
+
+    openEnterProject() {
+      this.$store.commit("showEnterProject");
     },
   },
 };

@@ -32,17 +32,12 @@
               v-model="description"
               :rules="descriptionRules"
               :counter="4000"
-              required
               label="Descrição do requisito"
             >
             </v-textarea>
           </v-form>
         </v-card-text>
         <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="close">
-            Fechar
-          </v-btn>
           <v-btn
             color="blue darken-1"
             text
@@ -50,6 +45,10 @@
             type="submit"
           >
             {{ cardButton }}
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" text @click="close">
+            Fechar
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -79,7 +78,6 @@ export default {
     ],
     description: "",
     descriptionRules: [
-      (v) => !!v || "Descrição é um campo necessário",
       (v) =>
         (v && v.length <= 4000) ||
         "Descrição deve ter menos que 4000 caracteres",
@@ -161,7 +159,7 @@ export default {
           })
           .catch(function(error) {
             console.log(error);
-            if (error.response.data.Message !== "") {
+            if (error.response.data.message !== "") {
               self.$snackbar.showMessage({
                 content: error.response.data.message,
                 color: "error",
