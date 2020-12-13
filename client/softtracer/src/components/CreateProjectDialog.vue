@@ -84,8 +84,8 @@ export default {
       const URL = self.$store.state.apiURL + "/projects";
 
       const data = {
-        name: this.name,
-        resume: this.resume,
+        Name: this.name,
+        Resume: this.resume,
       };
 
       const options = {

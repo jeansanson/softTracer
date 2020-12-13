@@ -8,10 +8,10 @@
       >
     </v-row>
     <v-row dense>
-      <v-col v-for="project in projects" :key="project.Id" :cols="cols">
+      <v-col v-for="project in projects" :key="project.id" :cols="cols">
         <v-card @click="loadProject(project)" height="190px">
           <v-card-title
-            v-text="project.Name"
+            v-text="project.name"
             class="justify-center project-title"
           ></v-card-title>
         </v-card>
@@ -80,7 +80,7 @@ export default {
     },
 
     loadProject(project) {
-      this.$router.push("/projects/" + project.Id);
+      this.$router.push("/projects/" + project.id);
     },
 
     openCreateProject() {

@@ -80,8 +80,6 @@ export default {
         },
       };
 
-      
-
       axios
         .post(URL, data, options)
         .then(function(response) {
@@ -93,10 +91,10 @@ export default {
           self.goToProjects();
         })
         .catch(function(error) {
-          console.log(error.response.data.Message);
-          if (error.response.data.Message !== "") {
+          console.log(error.response.data.message);
+          if (error.response.data.message !== "") {
             self.$snackbar.showMessage({
-              content: error.response.data.Message,
+              content: error.response.data.message,
               color: "error",
             });
           }

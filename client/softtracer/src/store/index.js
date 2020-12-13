@@ -14,7 +14,7 @@ export default new Vuex.Store({
     apiURL: "",
     currentProjectId: "",
     requirements: "",
-    editRequirement: false
+    editRequirement: [],
   },
   mutations: {
     // Show snackbar
@@ -28,6 +28,11 @@ export default new Vuex.Store({
     showCreateRequirement(state, payload) {
       state.currentProjectId = payload.projectId;
       state.requirements = payload.requirements;
+    },
+
+    showEditRequirement(state, payload) {
+      state.currentProjectId = payload.projectId;
+      state.requirements = payload.requirements;
       state.editRequirement = payload.editRequirement;
     },
 
@@ -36,14 +41,14 @@ export default new Vuex.Store({
 
     // Login credentials
     storeLogin(state, payload) {
-      state.user_name = payload.DisplayName;
-      state.user_email = payload.Email;
-      state.user_token = payload.Token;
-      state.user_id = payload.UserId;
-      localStorage.setItem("user_name", payload.DisplayName);
-      localStorage.setItem("user_email", payload.Email);
-      localStorage.setItem("user_token", payload.Token);
-      localStorage.setItem("user_id", payload.UserId);
+      state.user_name = payload.displayName;
+      state.user_email = payload.email;
+      state.user_token = payload.token;
+      state.user_id = payload.userId;
+      localStorage.setItem("user_name", payload.displayName);
+      localStorage.setItem("user_email", payload.email);
+      localStorage.setItem("user_token", payload.token);
+      localStorage.setItem("user_id", payload.userId);
     },
 
     logout(state) {
