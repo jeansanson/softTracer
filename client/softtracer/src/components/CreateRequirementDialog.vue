@@ -23,10 +23,7 @@
               item-value="id"
             ></v-select>
 
-            <v-checkbox
-              v-model="checkbox"
-              label="Completo"
-            ></v-checkbox>
+            <v-checkbox v-model="checkbox" label="Completo"></v-checkbox>
 
             <v-textarea
               v-model="description"
@@ -136,7 +133,7 @@ export default {
             Name: self.name,
             Description: self.description,
             parentId: self.select,
-            completed: self.checkbox
+            completed: self.checkbox,
           },
         ];
 
@@ -188,7 +185,7 @@ export default {
               Name: self.name,
               Description: self.description,
               parentId: self.select,
-              completed: self.checkbox
+              completed: self.checkbox,
             },
           ];
 

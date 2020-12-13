@@ -6,13 +6,14 @@
         <h1>{{ name }}</h1>
       </v-row>
     </div>
-    <v-navigation-drawer absolute permanent right width="350">
+    <Tasks />
+    <v-navigation-drawer absolute right :width="350">
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="font-weight-bold"
             >Resumo do projeto</v-list-item-title
           >
-          <v-text class="resume">{{ resume }}</v-text>
+          <span class="resume">{{ resume }}</span>
         </v-list-item-content>
       </v-list-item>
 
@@ -64,6 +65,7 @@
 
 <script>
 const axios = require("axios");
+import Tasks from "../components/Tasks";
 
 export default {
   name: "ProjectPage",
@@ -77,6 +79,9 @@ export default {
     tasks: [],
     token: "",
   }),
+  components: {
+    Tasks,
+  },
   created: function() {
     if (this.$store.state.user_token == "") {
       this.goToLogin();
@@ -103,7 +108,6 @@ export default {
       axios
         .get(URL, options)
         .then(function(response) {
-          console.log(response);
           self.dateCreated = self.convertDate(response.data.openingDate);
           self.resume = response.data.resume;
           self.name = response.data.name;

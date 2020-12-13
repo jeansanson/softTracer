@@ -25,11 +25,6 @@
       <router-view></router-view>
     </v-main>
 
-    <v-footer padless>
-      <v-col class="text-left" cols="12">
-        {{ new Date().getFullYear() }} — <strong>SoftTracer</strong>
-      </v-col>
-    </v-footer>
     <Snackbar />
   </v-app>
 </template>
