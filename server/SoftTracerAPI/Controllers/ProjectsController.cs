@@ -30,7 +30,6 @@ namespace SoftTracerAPI.Controllers
             return Ok(repository.Find(projectId));
         }
 
-
         [TokenAuthenticator]
         [HttpPost]
         public IHttpActionResult CreateProject([FromBody] CreateProjectCommand command)
@@ -40,6 +39,19 @@ namespace SoftTracerAPI.Controllers
             if (error.IsInvalid) { return BadRequest(error.Error); }
             ProjectsRepository repository = new ProjectsRepository(Connection, HttpContext.Current.User);
             return Ok(repository.Create(command));
+        }
+
+        [TokenAuthenticator]
+        [HttpPut]
+        public IHttpActionResult UpdateProject([FromBody] UpdateProjectCommand command)
+        {
+            if (command == null) { return BadRequest(DefaultMessages.InvalidBody); }
+            ValidationError error = new UpdateProjectCommandValidator().Validate(command);
+            if (error.IsInvalid) { return BadRequest(error.Error); }
+            ProjectsRepository repository = new ProjectsRepository(Connection, HttpContext.Current.User);
+            if (repository.Find(command.ProjectId) == null) { return BadRequest("Projeto não encontrado"); }
+            repository.Update(command);
+            return Ok();
         }
 
         [TokenAuthenticator]
@@ -61,11 +73,10 @@ namespace SoftTracerAPI.Controllers
             return Ok(repository.Find(command.ProjectToken));
         }
 
-
         [TokenAuthenticator]
         [HttpDelete]
         [Route("~/api/projects/{projectId:int}/users/{username}")]
-        public IHttpActionResult DeleteUser([FromUri] int projectId, [FromUri] string username )
+        public IHttpActionResult DeleteUser([FromUri] int projectId, [FromUri] string username)
         {
             ProjectsRepository repository = new ProjectsRepository(Connection, User);
             if (repository.Find(projectId) == null) { return BadRequest("Projeto não encontrado"); }
@@ -85,7 +96,6 @@ namespace SoftTracerAPI.Controllers
             return Ok(usersRepository.FindUsers(projectId));
         }
 
-
         [TokenAuthenticator]
         [HttpGet]
         [Route("~/api/projects/{projectId:int}/users/{username}")]
@@ -99,6 +109,5 @@ namespace SoftTracerAPI.Controllers
             if (user == null) { return NotFound(); }
             return Ok(user);
         }
-
     }
 }

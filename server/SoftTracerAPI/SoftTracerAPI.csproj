@@ -183,6 +183,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Commands\Projects\UpdateProjectCommandValidator.cs" />
+    <Compile Include="Commands\Projects\UpdateProjectCommand.cs" />
     <Compile Include="Commands\Projects\InsertUserCommandValidator.cs" />
     <Compile Include="Commands\Projects\InsertUserCommand.cs" />
     <Compile Include="Commands\Projects\CreateProjectCommand.cs" />

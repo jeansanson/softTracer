@@ -59,7 +59,26 @@ namespace SoftTracerAPI.Repositories
             return int.Parse(command.ExecuteScalar().ToString());
         }
 
-        #endregion CreateProject
+        #endregion Create
+
+        #region Update
+
+        public void Update(UpdateProjectCommand model)
+        {
+            MySqlCommand command = new MySqlCommand(GetUpdateCommandText(), _connection);
+            command.Parameters.Add("@name", MySqlDbType.VarChar).Value = model.Name;
+            command.Parameters.Add("@resume", MySqlDbType.VarChar).Value = model.Resume;
+            command.Parameters.Add("@projectId", MySqlDbType.VarChar).Value = model.ProjectId;
+        }
+
+        static private string GetUpdateCommandText()
+        {
+            StringBuilder sql = new StringBuilder();
+            sql.AppendLine("UPDATE projects set name=@name, resume=@resume WHERE projectId=@projectId");
+            return sql.ToString();
+        }
+
+        #endregion Update
 
         #region Find
 
@@ -119,7 +138,6 @@ namespace SoftTracerAPI.Repositories
             return sql.ToString();
         }
 
-
         static private string GetFindProjectsWithoutUserCheckQuery()
         {
             StringBuilder sql = new StringBuilder();
@@ -130,7 +148,6 @@ namespace SoftTracerAPI.Repositories
             sql.AppendLine(",PRO.resume FROM projects PRO");
             return sql.ToString();
         }
-
 
         private static Project PopulateProject(IDataReader reader)
         {
