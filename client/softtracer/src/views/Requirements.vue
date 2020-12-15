@@ -15,8 +15,30 @@
       v-if="requirements != null"
       hoverable
       activatable
+      rounded
       :items="requirements"
-    ></v-treeview>
+    >
+      <template v-slot:prepend="{ item }">
+        <v-icon v-if="(item.completed = false)" color="success" dark
+          >mdi-check</v-icon
+        >
+      </template>
+      <template v-slot:append="{ item }">
+        
+        <v-btn small rounded color="secondary" class="ma-2" @click="openEditRequirement(item)"
+          ><v-icon small>mdi-pencil-outline</v-icon></v-btn
+        >
+        <v-btn
+          small
+          rounded
+          color="error"
+          class="ma-2"
+          dark
+          @click="removeRequirement(item)"
+          ><v-icon small>mdi-close</v-icon></v-btn
+        >
+      </template>
+    </v-treeview>
 
     <CreateRequirementDialog />
   </v-container>
@@ -31,7 +53,7 @@ export default {
 
   data: () => ({
     projectId: "",
-    requirements: "",
+    requirements: [],
   }),
   components: {
     CreateRequirementDialog,
@@ -41,7 +63,6 @@ export default {
       this.$router.push("/login");
     } else {
       this.projectId = this.$route.params.pathMatch;
-      // faz o get do projeto pelo id, se der erro ele volta pra aba de projetos
       this.loadRequirements();
       this.$store.subscribe((mutation) => {
         if (mutation.type === "refreshRequirements") {
@@ -67,15 +88,6 @@ export default {
 
       axios.get(URL, options).then((resp) => {
         self.requirements = resp.data;
-        var obj = resp.data;
-        obj = obj.map(function(item) {
-          for (var key in item) {
-            item[key.toLowerCase()] = item[key];
-            delete item[key];
-          }
-          return item;
-        });
-        console.log(obj);
       });
     },
 
@@ -84,6 +96,42 @@ export default {
         projectId: this.projectId,
         requirements: this.requirements,
         editRequirement: "", // passar o requisito pra editar
+      });
+    },
+
+    openEditRequirement(item) {
+      this.$store.commit("showEditRequirement", {
+        projectId: this.projectId,
+        requirements: this.requirements,
+        editRequirement: item,
+      });
+    },
+
+    visualizeRequirement(item) {
+      console.log(item);
+    },
+
+    removeRequirement(item) {
+      let self = this;
+      const URL =
+        self.$store.state.apiURL +
+        "/projects/" +
+        self.projectId +
+        "/requirements/" +
+        item.id;
+
+      const options = {
+        headers: {
+          Authorization: self.$store.state.user_token,
+        },
+      };
+
+      axios.delete(URL, options).then(() => {
+        self.$snackbar.showMessage({
+          content: "Requisito deletado com sucesso!",
+          color: "success",
+        });
+        self.loadRequirements();
       });
     },
 

@@ -3,34 +3,38 @@
     <v-row>
       <h1 class="mb-5 mt-2 ml-3">Seus projetos</h1>
       <v-spacer></v-spacer>
+      <v-btn class="mt-4 mr-3" color="primary" @click="openEnterProject">Entrar em um projeto</v-btn>
       <v-btn class="mt-4 mr-3" color="primary" @click="openCreateProject"
         >Criar projeto</v-btn
       >
     </v-row>
     <v-row dense>
-      <v-col v-for="project in projects" :key="project.Id" :cols="cols">
+      <v-col v-for="project in projects" :key="project.id" :cols="cols">
         <v-card @click="loadProject(project)" height="190px">
           <v-card-title
-            v-text="project.Name"
+            v-text="project.name"
             class="justify-center project-title"
           ></v-card-title>
         </v-card>
       </v-col>
     </v-row>
 
+    <EnterProjectDialog />
     <CreateProjectDialog />
   </v-container>
 </template>
 
 <script>
 const axios = require("axios");
-import CreateProjectDialog from "../components/CreateProjectDialog";
+import CreateProjectDialog from "../components/EnterProjectDialog";
+import EnterProjectDialog from "../components/CreateProjectDialog";
 
 export default {
   name: "Projects",
 
   components: {
     CreateProjectDialog,
+    EnterProjectDialog
   },
   data: () => ({ projects: [] }),
   created: function() {
@@ -80,11 +84,15 @@ export default {
     },
 
     loadProject(project) {
-      this.$router.push("/projects/" + project.Id);
+      this.$router.push("/projects/" + project.id);
     },
 
     openCreateProject() {
       this.$store.commit("showCreateProject");
+    },
+
+    openEnterProject() {
+      this.$store.commit("showEnterProject");
     },
   },
 };

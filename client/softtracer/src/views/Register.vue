@@ -93,6 +93,7 @@ export default {
 
   methods: {
     register() {
+      let self = this;
       const URL = self.$store.state.apiURL + "/users";
 
       const data = {
@@ -101,8 +102,6 @@ export default {
         email: this.email,
         password: this.password,
       };
-
-      let self = this;
 
       axios
         .post(URL, data)
@@ -116,7 +115,7 @@ export default {
         .catch(function(error) {
           if (error.response.data.Message !== "") {
             self.$snackbar.showMessage({
-              content: error.response.data.Message,
+              content: error.response.data.message,
               color: "error",
             });
           }
