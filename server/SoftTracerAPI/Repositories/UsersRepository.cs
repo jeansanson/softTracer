@@ -46,7 +46,9 @@ namespace SoftTracerAPI.Repositories
         {
             MySqlCommand command = new MySqlCommand($"SELECT username FROM users WHERE token=@token", _connection);
             command.Parameters.AddWithValue("@token", token).DbType = DbType.Guid;
-            return command.ExecuteScalar().ToString();
+            var awnser = command.ExecuteScalar();
+            if (awnser == null) { return ""; }
+            return awnser.ToString();
         }
 
         #endregion FindUsernameByToken

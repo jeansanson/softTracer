@@ -69,6 +69,7 @@ namespace SoftTracerAPI.Repositories
             command.Parameters.Add("@name", MySqlDbType.VarChar).Value = model.Name;
             command.Parameters.Add("@resume", MySqlDbType.VarChar).Value = model.Resume;
             command.Parameters.Add("@projectId", MySqlDbType.VarChar).Value = model.ProjectId;
+            command.ExecuteNonQuery();
         }
 
         static private string GetUpdateCommandText()
