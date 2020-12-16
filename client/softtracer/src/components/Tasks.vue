@@ -261,10 +261,9 @@ export default {
       axios
         .put(URL, data, options)
         .then(function() {
-          self.getTasks();
         })
         .catch(function(error) {
-          console.log(error);
+          self.getTasks();
           if (error.response.data.message !== "") {
             self.$snackbar.showMessage({
               content: error.response.data.message,

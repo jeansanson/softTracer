@@ -75,9 +75,7 @@ export default {
     ],
     description: "",
     descriptionRules: [
-      (v) =>
-        (v && v.length <= 4000) ||
-        "Descrição deve ter menos que 4000 caracteres",
+      (v) => (v && v.length <= 4000) || "Descrição deve ter menos que 4000 caracteres"
     ],
     requirements: [],
   }),
