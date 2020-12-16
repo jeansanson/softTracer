@@ -5,8 +5,7 @@ namespace SofTracerAPI.Commands.Tasks
 {
     public class UpdateTaskCommand
     {
-
-        public int TaskId { get; set; }
+        public int Id { get; set; }
 
         public int RequirementId { get; set; }
 
@@ -19,6 +18,5 @@ namespace SofTracerAPI.Commands.Tasks
         public List<string> Responsibles { get; set; }
 
         public TaskStage Stage { get; set; }
-
     }
 }

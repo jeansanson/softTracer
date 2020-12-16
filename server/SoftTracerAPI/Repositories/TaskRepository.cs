@@ -20,9 +20,10 @@ namespace SoftTracerAPI.Repositories
         }
 
         #region Update
+
         public void Update(UpdateTaskCommand model)
         {
-            Delete(model.ProjectId, model.TaskId);
+            Delete(model.ProjectId, model.Id);
             MySqlCommand command = _connection.CreateCommand();
             command.CommandText = GetCreateQuery();
             PopulateUpdateCommand(model, command);
@@ -30,7 +31,7 @@ namespace SoftTracerAPI.Repositories
             {
                 foreach (string responsible in model.Responsibles)
                 {
-                    InsertResponsible(model.ProjectId, model.TaskId, responsible);
+                    InsertResponsible(model.ProjectId, model.Id, responsible);
                 }
             }
             command.ExecuteNonQuery();
@@ -40,13 +41,13 @@ namespace SoftTracerAPI.Repositories
         {
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = model.ProjectId;
             command.Parameters.Add("@requirementId", MySqlDbType.Int32).Value = model.RequirementId;
-            command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = model.TaskId;
+            command.Parameters.Add("@taskId", MySqlDbType.Int32).Value = model.Id;
             command.Parameters.Add("@name", MySqlDbType.VarChar).Value = model.Name;
             command.Parameters.Add("@description", MySqlDbType.VarChar).Value = model.Description;
             command.Parameters.Add("@stage", MySqlDbType.Int32).Value = model.Stage;
         }
 
-        #endregion
+        #endregion Update
 
         #region Create
 
@@ -56,16 +57,16 @@ namespace SoftTracerAPI.Repositories
             MySqlCommand command = _connection.CreateCommand();
             command.CommandText = GetCreateQuery();
             PopulateCreateCommand(taskId, model, command);
-            if(model.Responsibles != null)
+            if (model.Responsibles != null)
             {
-                foreach(string  responsible in model.Responsibles)
+                foreach (string responsible in model.Responsibles)
                 {
                     InsertResponsible(model.ProjectId, taskId, responsible);
                 }
             }
             command.ExecuteNonQuery();
             return Find(model.ProjectId, taskId);
-        } 
+        }
 
         private static void PopulateCreateCommand(int taskId, CreateTaskCommand model, MySqlCommand command)
         {
@@ -96,7 +97,6 @@ namespace SoftTracerAPI.Repositories
             sql.AppendLine(",@stage)");
             return sql.ToString();
         }
-
 
         private int FindNextId(int projectId)
         {
@@ -135,8 +135,7 @@ namespace SoftTracerAPI.Repositories
             DeleteResponsibles(projectId);
         }
 
-        #endregion
-
+        #endregion Delete
 
         public List<Task> Find(int projectId)
         {
@@ -152,7 +151,7 @@ namespace SoftTracerAPI.Repositories
                     result.Add(PopulateTask(reader));
                 }
             }
-            foreach(Task task in result)
+            foreach (Task task in result)
             {
                 PopulateResponsibles(task);
             }
@@ -209,7 +208,6 @@ namespace SoftTracerAPI.Repositories
             };
         }
 
-
         private string GetFindTaskHeaderQuery()
         {
             StringBuilder query = new StringBuilder();
@@ -264,7 +262,5 @@ namespace SoftTracerAPI.Repositories
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
             command.ExecuteNonQuery();
         }
-
-
     }
 }

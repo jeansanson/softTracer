@@ -7,7 +7,7 @@ namespace SofTracerAPI.Commands.Tasks
         public ValidationError Validate(UpdateTaskCommand command)
         {
             if (command.ProjectId <= 0) { _manager.AddError("Projeto inválido"); }
-            if (command.TaskId < 0) { _manager.AddError("Tarefa inválida"); }
+            if (command.Id < 0) { _manager.AddError("Tarefa inválida"); }
             if (string.IsNullOrWhiteSpace(command.Name)) { _manager.AddError("Nome inválido"); }
             if ($"{command.Name}".Length > 255) { _manager.AddError("Nome possui muitos caracteres"); }
             if ($"{command.Description}".Length > 4090) { _manager.AddError("Descrição possui muitos caracteres"); }
