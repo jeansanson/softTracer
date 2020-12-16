@@ -6,11 +6,12 @@
           v-model="newTask"
           required
           label="Tarefa"
-          @keyup.enter="add"
+          :counter="255"
+          @keyup.enter="addTask"
         ></v-text-field>
       </v-col>
       <v-col cols="12" md="4" class="mt-4">
-        <v-btn @click="add" color="primary" class="ml-3">Adicionar</v-btn>
+        <v-btn @click="addTask" color="primary" class="ml-3">Adicionar</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -21,10 +22,11 @@
             class="list-group kanban-column"
             :list="arrBackLog"
             group="tasks"
+            @change="changed(1, $event)"
           >
             <v-card
               v-for="element in arrBackLog"
-              :key="element.name"
+              :key="element.id"
               class="mb-2 ml-2 mr-2"
               style="cursor: pointer;"
             >
@@ -43,10 +45,11 @@
             class="list-group kanban-column"
             :list="arrToDo"
             group="tasks"
+            @change="changed(2, $event)"
           >
             <v-card
               v-for="element in arrToDo"
-              :key="element.name"
+              :key="element.id"
               class="mb-2 ml-2 mr-2"
               style="cursor: pointer;"
             >
@@ -65,10 +68,11 @@
             class="list-group kanban-column"
             :list="arrDoing"
             group="tasks"
+            @change="changed(3, $event)"
           >
             <v-card
               v-for="element in arrDoing"
-              :key="element.name"
+              :key="element.id"
               class="mb-2 ml-2 mr-2"
               style="cursor: pointer;"
             >
@@ -87,10 +91,11 @@
             class="list-group kanban-column"
             :list="arrDone"
             group="tasks"
+            @change="changed(4, $event)"
           >
             <v-card
               v-for="element in arrDone"
-              :key="element.name"
+              :key="element.id"
               class="mb-2 ml-2 mr-2"
               style="cursor: pointer;"
             >
@@ -106,8 +111,8 @@
 </template>
 
 <script>
-//import draggable
 import draggable from "vuedraggable";
+const axios = require("axios");
 
 export default {
   name: "Tasks",
@@ -117,31 +122,162 @@ export default {
   data() {
     return {
       newTask: "",
-      arrBackLog: [
-        { name: "Task 1" },
-        { name: "Task 2" },
-        { name: "Task 3" },
-        { name: "Task 4" },
-      ],
+      arrBackLog: [],
       arrToDo: [],
       arrDoing: [],
       arrDone: [],
     };
   },
+  created: function() {
+    this.getTasks();
+  },
   methods: {
     //add new tasks method
-    add: function() {
-      if (this.newTask) {
-        this.arrBackLog.push({ name: this.newTask });
-        this.newTask = "";
+    addTask() {
+      let self = this;
+
+      const URL =
+        self.$store.state.apiURL +
+        "/projects/" +
+        this.$store.state.currentProjectId +
+        "/tasks";
+
+      const data = {
+        name: this.newTask,
+        projectId: this.$store.state.currentProjectId,
+        stage: 1,
+      };
+
+      const options = {
+        headers: {
+          Authorization: self.$store.state.user_token,
+        },
+      };
+
+      axios
+        .post(URL, data, options)
+        .then(function() {
+          self.$snackbar.showMessage({
+            content: "Tarefa criada com sucesso!",
+            color: "success",
+          });
+          self.newTask = "";
+          self.getTasks();
+        })
+        .catch(function(error) {
+          console.log(error);
+          if (error.response.data.message !== "") {
+            self.$snackbar.showMessage({
+              content: error.response.data.message,
+              color: "error",
+            });
+          }
+        });
+    },
+
+    getTasks() {
+      this.arrBackLog = [];
+      this.arrToDo = [];
+      this.arrDoing = [];
+      this.arrDone = [];
+
+      let self = this;
+      const URL =
+        self.$store.state.apiURL +
+        "/projects/" +
+        this.$store.state.currentProjectId +
+        "/tasks";
+
+      const options = {
+        headers: {
+          Authorization: self.$store.state.user_token,
+        },
+      };
+
+      axios.get(URL, options).then((resp) => {
+        var backlog = [];
+        var todo = [];
+        var doing = [];
+        var done = [];
+
+        resp.data.forEach((element) => {
+          if(element.requirementName && element.requirementName.length > 0) element.name += ` [REQ: ${element.requirementName}]`;
+          switch (element["stage"]) {
+            case 1:
+              backlog.push(element);
+              break;
+            case 2:
+              todo.push(element);
+              break;
+            case 3:
+              doing.push(element);
+              break;
+            case 4:
+              done.push(element);
+              break;
+            default:
+              break;
+          }
+        });
+
+        self.arrBackLog = backlog;
+        self.arrToDo = todo;
+        self.arrDoing = doing;
+        self.arrDone = done;
+      });
+    },
+
+    changed(stage, event) {
+      // console.log(id, event);
+      if ("added" in event) {
+        var task = event.added.element;
+        this.editTaskStage(task.id, task.name, stage);
       }
+    },
+
+    editTaskStage(id, name, stage) {
+      let self = this;
+
+      const URL =
+        self.$store.state.apiURL +
+        "/projects/" +
+        this.$store.state.currentProjectId +
+        "/tasks/" +
+        id;
+
+      const data = {
+        id: id,
+        name: name,
+        projectId: this.$store.state.currentProjectId,
+        stage: stage,
+      };
+
+      const options = {
+        headers: {
+          Authorization: self.$store.state.user_token,
+        },
+      };
+
+      axios
+        .put(URL, data, options)
+        .then(function() {
+          self.getTasks();
+        })
+        .catch(function(error) {
+          console.log(error);
+          if (error.response.data.message !== "") {
+            self.$snackbar.showMessage({
+              content: error.response.data.message,
+              color: "error",
+            });
+          }
+        });
     },
   },
 };
 </script>
 
 <style>
-/* light stylings for the kanban columns */
 .kanban-column {
   min-height: 300px;
 }

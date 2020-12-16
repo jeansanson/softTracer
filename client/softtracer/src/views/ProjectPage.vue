@@ -1,13 +1,13 @@
 <template>
   <v-container>
-    <div>
+    <div style="width: 80%">
       <v-row class="mb-5 mt-2 ml-3">
         <v-icon class="mr-3" @click="goToProjects">mdi-arrow-left</v-icon>
         <h1>{{ name }}</h1>
       </v-row>
+      <Tasks />
     </div>
-    <Tasks />
-    <v-navigation-drawer absolute right :width="350">
+    <v-navigation-drawer absolute right :width="350" >
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="font-weight-bold"
@@ -49,7 +49,7 @@
             :items="requirements"
           >
             <template v-slot:prepend="{ item }">
-              <v-icon v-if="(item.completed = false)" color="success" dark
+              <v-icon v-if="item.completed == true" color="success" dark
                 >mdi-check</v-icon
               >
             </template>
@@ -96,6 +96,7 @@ export default {
       let self = this;
 
       this.id = this.$route.params.pathMatch;
+      this.$store.commit("setCurrentProjectId", this.id);
 
       const URL = self.$store.state.apiURL + "/projects/" + this.id;
 

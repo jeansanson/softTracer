@@ -27,6 +27,10 @@ export default new Vuex.Store({
     
     showEnterProject() {},
 
+    setCurrentProjectId(state, id) {
+      state.currentProjectId = id;
+    },
+
     showCreateRequirement(state, payload) {
       state.currentProjectId = payload.projectId;
       state.requirements = payload.requirements;
