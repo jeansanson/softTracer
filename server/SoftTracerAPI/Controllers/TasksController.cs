@@ -1,8 +1,6 @@
 ﻿using SofTracerAPI.Commands;
 using SofTracerAPI.Controllers;
-using SoftTracerAPI.Commands.Users;
 using SoftTracerAPI.Repositories;
-using SoftTracerAPI.Models;
 using System.Web.Http;
 using SoftTracerAPI.Misc;
 using SofTracerAPI.Commands.Tasks;

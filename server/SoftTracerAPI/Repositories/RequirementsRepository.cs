@@ -146,7 +146,30 @@ namespace SoftTracerAPI.Repositories
                     everyRequirement.Add(PopulateRequirement(reader));
                 }
             }
+            foreach (Requirement requirement in everyRequirement)
+            {
+                CheckTaskCompletion(projectId, requirement);
+            }
             PopulateParents(everyRequirement);
+        }
+
+        private void CheckTaskCompletion(int projectId, Requirement requirement)
+        {
+            MySqlCommand command = new MySqlCommand("SELECT COUNT(0) AS totalTasks, SUM(IF(stage=4,1,0)) AS completed FROM tasks WHERE requirementId=@requirementId AND projectId=@projectId", _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.Parameters.Add("@requirementId", MySqlDbType.Int32).Value = requirement.Id;
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    int totalTasks = int.Parse(reader["totalTasks"].ToString());
+                    if (totalTasks > 0)
+                    {
+                        int completed = int.Parse(reader["completed"].ToString());
+                        requirement.Completed = totalTasks == completed;
+                    }
+                }
+            }
         }
 
         private static void PopulateParents(List<Requirement> everyRequirement)
@@ -188,7 +211,7 @@ namespace SoftTracerAPI.Repositories
 
         #endregion Find
 
-         private int FindNextId(int projectId)
+        private int FindNextId(int projectId)
         {
             MySqlCommand command = new MySqlCommand($"SELECT IFNULL(MAX(requirementId) + 1,1) FROM requirements WHERE projectId=@projectId", _connection);
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;

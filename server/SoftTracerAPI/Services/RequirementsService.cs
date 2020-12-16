@@ -26,10 +26,10 @@ namespace SofTracerAPI.Services
             {
                 Requirement requirement = new Requirement()
                 {
-                    Completed = false,
+                    Completed = item.Completed,
                     Name = item.Name,
                     Description = item.Description,
-                    Children = new List<Requirement>()
+                    Children = new List<Requirement>(),
                 };
                 if (item.ParentId > 0)
                 {
@@ -52,7 +52,7 @@ namespace SofTracerAPI.Services
         {
             Requirement requirement = new Requirement()
             {
-                Completed = false,
+                Completed = command.Completed,
                 Name = command.Name,
                 Description = command.Description,
                 Children = new List<Requirement>()
@@ -80,7 +80,7 @@ namespace SofTracerAPI.Services
                 {
                     Id = item.Id,
                     ParentId = item.ParentId,
-                    Completed = false,
+                    Completed = item.Completed,
                     Name = item.Name,
                     Description = item.Description,
                     Children = new List<Requirement>()
@@ -104,7 +104,7 @@ namespace SofTracerAPI.Services
             {
                 Id = command.Id,
                 ParentId = command.ParentId,
-                Completed = false,
+                Completed = command.Completed,
                 Name = command.Name,
                 Description = command.Description,
                 Children = new List<Requirement>()
