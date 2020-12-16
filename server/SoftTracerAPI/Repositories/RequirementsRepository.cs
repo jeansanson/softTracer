@@ -219,17 +219,12 @@ namespace SoftTracerAPI.Repositories
 
         private static void CheckParentCompletion(Requirement parent)
         {
-            foreach(Requirement child in parent.Children)
+            foreach (Requirement child in parent.Children)
             {
                 if (parent.Completed == true)
                 {
                     child.Completed = parent.Completed;
                 }
-            }
-
-            foreach (Requirement child in parent.Children)
-            {
-                CheckParentCompletion(child);
             }
         }
 
