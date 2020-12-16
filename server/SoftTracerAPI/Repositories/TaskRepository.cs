@@ -142,7 +142,7 @@ namespace SoftTracerAPI.Repositories
         {
             List<Task> result = new List<Task>();
             StringBuilder query = new StringBuilder(GetFindTaskHeaderQuery());
-            query.AppendLine("WHERE projectId=@projectId");
+            query.AppendLine("WHERE TA.projectId=@projectId");
             MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
             using (IDataReader reader = command.ExecuteReader())
@@ -163,7 +163,7 @@ namespace SoftTracerAPI.Repositories
         {
             Task result = null;
             StringBuilder query = new StringBuilder(GetFindTaskHeaderQuery());
-            query.AppendLine("WHERE projectId=@projectId");
+            query.AppendLine("WHERE TA.projectId=@projectId");
             query.AppendLine("AND taskId=@taskId");
             MySqlCommand command = new MySqlCommand(query.ToString(), _connection);
             command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
@@ -205,6 +205,7 @@ namespace SoftTracerAPI.Repositories
                 RequirementId = int.Parse(reader["requirementId"].ToString()),
                 Stage = (SofTracerAPI.Models.Tasks.TaskStage)int.Parse(reader["stage"].ToString()),
                 Responsibles = new List<string>(),
+                RequirementName = reader["requirementName"].ToString()
             };
         }
 
@@ -213,13 +214,14 @@ namespace SoftTracerAPI.Repositories
         {
             StringBuilder query = new StringBuilder();
             query.AppendLine("SELECT");
-            query.AppendLine("taskId");
-            query.AppendLine(",projectId");
-            query.AppendLine(",requirementId");
-            query.AppendLine(",name");
-            query.AppendLine(",description");
+            query.AppendLine("TA.taskId");
+            query.AppendLine(",TA.projectId");
+            query.AppendLine(",TA.requirementId");
+            query.AppendLine(",TA.name");
+            query.AppendLine(",TA.description");
             query.AppendLine(",stage");
-            query.AppendLine("FROM tasks");
+            query.AppendLine(",RE.name as requirementName");
+            query.AppendLine("FROM tasks TA LEFT JOIN requirements RE ON RE.projectId=TA.projectId AND RE.requirementId=TA.requirementId");
             return query.ToString();
         }
 

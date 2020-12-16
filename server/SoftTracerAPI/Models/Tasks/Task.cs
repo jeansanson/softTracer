@@ -8,6 +8,8 @@ namespace SofTracerAPI.Models.Tasks
 
         public int RequirementId { get; set; }
 
+        public string RequirementName { get; set; }
+
         public int ProjectId { get; set; }
 
         public string Name { get; set; }
