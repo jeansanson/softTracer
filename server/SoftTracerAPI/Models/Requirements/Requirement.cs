@@ -15,5 +15,8 @@ namespace SofTracerAPI.Models.Projects.Requirements
         public List<Requirement> Children { get; set; }
 
         public int ParentId { get; set; }
+
+        public List<RequirementTask> RelatedTasks { get; set; }
+
     }
 }

@@ -218,6 +218,7 @@
     <Compile Include="Misc\Extensions.cs" />
     <Compile Include="Misc\Connection.cs" />
     <Compile Include="Models\Projects\ProjectHeader.cs" />
+    <Compile Include="Models\Requirements\RequirementTask.cs" />
     <Compile Include="Models\Requirements\Requirement.cs" />
     <Compile Include="Models\Projects\UserRole.cs" />
     <Compile Include="Models\Tasks\Task.cs" />

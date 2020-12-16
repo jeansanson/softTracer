@@ -7,6 +7,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using ExtensionMethods;
+using SofTracerAPI.Models.Tasks;
 
 namespace SoftTracerAPI.Repositories
 {
@@ -90,6 +91,19 @@ namespace SoftTracerAPI.Repositories
             command.ExecuteNonQuery();
         }
 
+        public void Update(int projectId, Requirement requirement)
+        {
+            MySqlCommand command = _connection.CreateCommand();
+            command.CommandText = "UPDATE requirements SET name=@name, description=@description, completed=@completed, parentId=@parentId WHERE projectId=@projectId AND requirementId=@requirementId";
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.Parameters.Add("@requirementId", MySqlDbType.Int32).Value = requirement.Id;
+            command.Parameters.Add("@parentId", MySqlDbType.Int32).Value = requirement.ParentId;
+            command.Parameters.Add("@name", MySqlDbType.VarChar).Value = requirement.Name;
+            command.Parameters.Add("@description", MySqlDbType.VarChar).Value = requirement.Description;
+            command.Parameters.Add("@completed", MySqlDbType.Bit).Value = requirement.Completed;
+            command.ExecuteNonQuery();
+        }
+
         public void Delete(int projectId)
         {
             MySqlCommand command = _connection.CreateCommand();
@@ -106,14 +120,9 @@ namespace SoftTracerAPI.Repositories
         {
             foreach (Requirement requirement in requirements)
             {
-                Delete(projectId, requirement.Id);
-                Create(projectId, requirement);
+                Update(projectId, requirement);
                 if (requirement.Children == null) return;
-                foreach (Requirement childRequirement in requirement.Children)
-                {
-                    Delete(projectId, childRequirement.Id);
-                    Create(projectId, childRequirement);
-                }
+                Update(projectId, requirement.Children);
             }
         }
 
@@ -149,6 +158,7 @@ namespace SoftTracerAPI.Repositories
             foreach (Requirement requirement in everyRequirement)
             {
                 CheckTaskCompletion(projectId, requirement);
+                PopulateRequirementsTasks(projectId, requirement);
             }
             PopulateParents(everyRequirement);
         }
@@ -172,13 +182,54 @@ namespace SoftTracerAPI.Repositories
             }
         }
 
+        private void PopulateRequirementsTasks(int projectId, Requirement requirement)
+        {
+            requirement.RelatedTasks = new List<RequirementTask>();
+            MySqlCommand command = new MySqlCommand("SELECT taskId, name, stage FROM tasks WHERE requirementId=@requirementId AND projectId=@projectId", _connection);
+            command.Parameters.Add("@projectId", MySqlDbType.Int32).Value = projectId;
+            command.Parameters.Add("@requirementId", MySqlDbType.Int32).Value = requirement.Id;
+            using (IDataReader reader = command.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    RequirementTask requirementTask = new RequirementTask()
+                    {
+                        Id = int.Parse(reader["taskId"].ToString()),
+                        Name = reader["name"].ToString(),
+                        Stage = (TaskStage)int.Parse(reader["stage"].ToString())
+                    };
+                    requirement.RelatedTasks.Add(requirementTask);
+                }
+            }
+        }
+
         private static void PopulateParents(List<Requirement> everyRequirement)
         {
             List<Requirement> childs = everyRequirement.Where(item => item.ParentId > 0).ToList();
             foreach (Requirement child in childs)
             {
                 Requirement parent = everyRequirement.FirstOrDefault(item => item.Id == child.ParentId);
-                if (parent != null) parent.Children.Add(child);
+                if (parent != null)
+                {
+                    parent.Children.Add(child);
+                    CheckParentCompletion(parent);
+                };
+            }
+        }
+
+        private static void CheckParentCompletion(Requirement parent)
+        {
+            foreach(Requirement child in parent.Children)
+            {
+                if (parent.Completed == true)
+                {
+                    child.Completed = parent.Completed;
+                }
+            }
+
+            foreach (Requirement child in parent.Children)
+            {
+                CheckParentCompletion(child);
             }
         }
 
