@@ -206,7 +206,7 @@ export default {
             })
             .catch(function(error) {
               console.log(error);
-              if (error.response.data.Message !== "") {
+              if (error.response.data.message !== "") {
                 self.$snackbar.showMessage({
                   content: error.response.data.message,
                   color: "error",

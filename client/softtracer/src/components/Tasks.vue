@@ -29,6 +29,8 @@
               :key="element.id"
               class="mb-2 ml-2 mr-2"
               style="cursor: pointer;"
+              @click="editTask(element)"
+              :ripple="false"
             >
               <v-card-title style="font-size: 16px">{{
                 element.name
@@ -52,6 +54,8 @@
               :key="element.id"
               class="mb-2 ml-2 mr-2"
               style="cursor: pointer;"
+              @click="editTask(element)"
+              :ripple="false"
             >
               <v-card-title style="font-size: 16px">{{
                 element.name
@@ -75,6 +79,8 @@
               :key="element.id"
               class="mb-2 ml-2 mr-2"
               style="cursor: pointer;"
+              @click="editTask(element)"
+              :ripple="false"
             >
               <v-card-title style="font-size: 16px">{{
                 element.name
@@ -98,6 +104,8 @@
               :key="element.id"
               class="mb-2 ml-2 mr-2"
               style="cursor: pointer;"
+              @click="editTask(element)"
+              :ripple="false"
             >
               <v-card-title style="font-size: 16px">{{
                 element.name
@@ -107,17 +115,20 @@
         </v-card>
       </v-col>
     </v-row>
+    <EditTaskDialog />
   </div>
 </template>
 
 <script>
 import draggable from "vuedraggable";
+import EditTaskDialog from "../components/EditTaskDialog";
 const axios = require("axios");
 
 export default {
   name: "Tasks",
   components: {
     draggable,
+    EditTaskDialog,
   },
   data() {
     return {
@@ -130,6 +141,11 @@ export default {
   },
   created: function() {
     this.getTasks();
+    this.$store.subscribe((mutation) => {
+      if (mutation.type === "refreshTasks") {
+        this.getTasks();
+      }
+    });
   },
   methods: {
     //add new tasks method
@@ -201,7 +217,8 @@ export default {
         var done = [];
 
         resp.data.forEach((element) => {
-          if(element.requirementName && element.requirementName.length > 0) element.name += ` [REQ: ${element.requirementName}]`;
+          // if (element.requirementName && element.requirementName.length > 0)
+          //   element.name += ` [REQ: ${element.requirementName}]`;
           switch (element["stage"]) {
             case 1:
               backlog.push(element);
@@ -224,6 +241,12 @@ export default {
         self.arrToDo = todo;
         self.arrDoing = doing;
         self.arrDone = done;
+      });
+    },
+
+    editTask(task) {
+      this.$store.commit("showEditTask", {
+        task: task,
       });
     },
 
@@ -260,8 +283,7 @@ export default {
 
       axios
         .put(URL, data, options)
-        .then(function() {
-        })
+        .then(function() {})
         .catch(function(error) {
           self.getTasks();
           if (error.response.data.message !== "") {

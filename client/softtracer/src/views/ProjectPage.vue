@@ -138,6 +138,7 @@ export default {
 
       axios.get(URL, options).then((resp) => {
         self.requirements = resp.data;
+        self.$store.commit("setRequirements", resp.data);
       });
     },
 
