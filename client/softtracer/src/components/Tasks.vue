@@ -254,6 +254,7 @@ export default {
       // console.log(id, event);
       if ("added" in event) {
         var task = event.added.element;
+        task.stage = stage;
         this.editTaskStage(task.id, task.name, stage);
       }
     },
