@@ -75,9 +75,7 @@ export default {
     ],
     description: "",
     descriptionRules: [
-      (v) =>
-        (v && v.length <= 4000) ||
-        "Descrição deve ter menos que 4000 caracteres",
+      (v) => (v && v.length <= 4000) || "Descrição deve ter menos que 4000 caracteres"
     ],
     requirements: [],
   }),
@@ -208,7 +206,7 @@ export default {
             })
             .catch(function(error) {
               console.log(error);
-              if (error.response.data.Message !== "") {
+              if (error.response.data.message !== "") {
                 self.$snackbar.showMessage({
                   content: error.response.data.message,
                   color: "error",

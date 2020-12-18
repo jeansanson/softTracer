@@ -1,12 +1,13 @@
 <template>
   <v-container>
-    <div>
+    <div style="width: 80%">
       <v-row class="mb-5 mt-2 ml-3">
         <v-icon class="mr-3" @click="goToProjects">mdi-arrow-left</v-icon>
-        <h1>{{ name }}</h1>
+        <h1 class="mr-3">{{ name }}</h1>
+        <v-icon @click="editProject">mdi-pencil</v-icon>
       </v-row>
+      <Tasks />
     </div>
-    <Tasks />
     <v-navigation-drawer absolute right :width="350">
       <v-list-item>
         <v-list-item-content>
@@ -49,7 +50,7 @@
             :items="requirements"
           >
             <template v-slot:prepend="{ item }">
-              <v-icon v-if="(item.completed = false)" color="success" dark
+              <v-icon v-if="item.completed == true" color="success" dark
                 >mdi-check</v-icon
               >
             </template>
@@ -60,12 +61,14 @@
         </v-list-item-content>
       </v-list-item>
     </v-navigation-drawer>
+    <EditProjectDialog />
   </v-container>
 </template>
 
 <script>
 const axios = require("axios");
 import Tasks from "../components/Tasks";
+import EditProjectDialog from "../components/EditProjectDialog";
 
 export default {
   name: "ProjectPage",
@@ -81,6 +84,7 @@ export default {
   }),
   components: {
     Tasks,
+    EditProjectDialog,
   },
   created: function() {
     if (this.$store.state.user_token == "") {
@@ -96,6 +100,7 @@ export default {
       let self = this;
 
       this.id = this.$route.params.pathMatch;
+      this.$store.commit("setCurrentProjectId", this.id);
 
       const URL = self.$store.state.apiURL + "/projects/" + this.id;
 
@@ -137,12 +142,20 @@ export default {
 
       axios.get(URL, options).then((resp) => {
         self.requirements = resp.data;
+        self.$store.commit("setRequirements", resp.data);
       });
     },
 
     convertDate(string) {
       const date = new Date(string);
       return date.toLocaleDateString("pt-BR", { dateStyle: "long" });
+    },
+
+    editProject() {
+      this.$store.commit("showEditProject", {
+        name: this.name,
+        resume: this.resume,
+      });
     },
 
     // Route related methods

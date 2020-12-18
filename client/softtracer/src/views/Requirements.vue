@@ -19,7 +19,7 @@
       :items="requirements"
     >
       <template v-slot:prepend="{ item }">
-        <v-icon v-if="(item.completed = false)" color="success" dark
+        <v-icon v-if="(item.completed == true)" color="success" dark
           >mdi-check</v-icon
         >
       </template>

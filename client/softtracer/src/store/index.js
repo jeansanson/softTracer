@@ -15,6 +15,9 @@ export default new Vuex.Store({
     currentProjectId: "",
     requirements: "",
     editRequirement: [],
+    selectedTask: [],
+    editProjectName: "",
+    editProjectResume: "",
   },
   mutations: {
     // Show snackbar
@@ -26,6 +29,23 @@ export default new Vuex.Store({
     showCreateProject() {},
     
     showEnterProject() {},
+
+    showEditTask(state, payload) {
+      state.selectedTask = payload.task;
+    },
+
+    showEditProject(state, payload) {
+      state.editProjectName = payload.name;
+      state.editProjectResume = payload.resume;
+    },
+
+    setCurrentProjectId(state, id) {
+      state.currentProjectId = id;
+    },
+
+    setRequirements(state, requirements) {
+      state.requirements = requirements;
+    },
 
     showCreateRequirement(state, payload) {
       state.currentProjectId = payload.projectId;
@@ -41,6 +61,8 @@ export default new Vuex.Store({
     refreshProjects() {},
     
     refreshRequirements() {},
+
+    refreshTasks() {},
 
     // Login credentials
     storeLogin(state, payload) {
