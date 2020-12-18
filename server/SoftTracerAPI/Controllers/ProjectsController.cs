@@ -42,6 +42,7 @@ namespace SoftTracerAPI.Controllers
         }
 
         [TokenAuthenticator]
+        [HttpPut]
         [Route("~/api/projects/{projectId:int}")]
         public IHttpActionResult UpdateProject([FromBody] UpdateProjectCommand command)
         {
