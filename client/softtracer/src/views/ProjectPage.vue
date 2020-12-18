@@ -3,11 +3,12 @@
     <div style="width: 80%">
       <v-row class="mb-5 mt-2 ml-3">
         <v-icon class="mr-3" @click="goToProjects">mdi-arrow-left</v-icon>
-        <h1>{{ name }}</h1>
+        <h1 class="mr-3">{{ name }}</h1>
+        <v-icon @click="editProject">mdi-pencil</v-icon>
       </v-row>
       <Tasks />
     </div>
-    <v-navigation-drawer absolute right :width="350" >
+    <v-navigation-drawer absolute right :width="350">
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title class="font-weight-bold"
@@ -60,12 +61,14 @@
         </v-list-item-content>
       </v-list-item>
     </v-navigation-drawer>
+    <EditProjectDialog />
   </v-container>
 </template>
 
 <script>
 const axios = require("axios");
 import Tasks from "../components/Tasks";
+import EditProjectDialog from "../components/EditProjectDialog";
 
 export default {
   name: "ProjectPage",
@@ -81,6 +84,7 @@ export default {
   }),
   components: {
     Tasks,
+    EditProjectDialog,
   },
   created: function() {
     if (this.$store.state.user_token == "") {
@@ -145,6 +149,13 @@ export default {
     convertDate(string) {
       const date = new Date(string);
       return date.toLocaleDateString("pt-BR", { dateStyle: "long" });
+    },
+
+    editProject() {
+      this.$store.commit("showEditProject", {
+        name: this.name,
+        resume: this.resume,
+      });
     },
 
     // Route related methods

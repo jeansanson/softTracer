@@ -16,6 +16,8 @@ export default new Vuex.Store({
     requirements: "",
     editRequirement: [],
     selectedTask: [],
+    editProjectName: "",
+    editProjectResume: "",
   },
   mutations: {
     // Show snackbar
@@ -30,6 +32,11 @@ export default new Vuex.Store({
 
     showEditTask(state, payload) {
       state.selectedTask = payload.task;
+    },
+
+    showEditProject(state, payload) {
+      state.editProjectName = payload.name;
+      state.editProjectResume = payload.resume;
     },
 
     setCurrentProjectId(state, id) {
